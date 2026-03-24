@@ -104,11 +104,13 @@ const Home = () => {
             <div className="rounded-xl border border-border bg-card p-6 sm:p-8">
               <p className="mb-6 text-muted-foreground leading-relaxed">
                 This project is dedicated to the memory of <strong className="text-foreground">Arthur Haddock</strong>,
-                whose tireless decades of research into the Haddock family history made all of this
-                possible. Arthur meticulously traced records across Durham, Yorkshire, Lancashire, and
-                Suffolk — visiting parish churches, combing through county archives, and corresponding
-                with distant relatives. His devotion to preserving our family's story is the
-                foundation upon which this digital heritage is built. He is deeply missed.
+                whose lifelong passion for family history made all of this possible. Arthur traced
+                records across the globe — from the parish churches and county archives of Durham,
+                Yorkshire, Lancashire, and Suffolk, to the furthest reaches of Australia and beyond.
+                He corresponded with distant relatives on multiple continents, meticulously piecing
+                together centuries of births, marriages, and migrations. His extraordinary devotion
+                to preserving our family's story is the foundation upon which this digital heritage
+                is built.
               </p>
 
               <p className="mb-4 text-sm text-muted-foreground leading-relaxed">
