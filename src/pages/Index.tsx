@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useSearchParams } from "react-router-dom";
 import { GitBranch, Clock, MapPin, Users, Home } from "lucide-react";
 import TreeView from "@/components/TreeView";
 import TimelineView from "@/components/TimelineView";
@@ -9,7 +9,18 @@ import { useFamilyMembers } from "@/hooks/useFamilyMembers";
 type View = "tree" | "timeline" | "map";
 
 const Index = () => {
-  const [view, setView] = useState<View>("tree");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [view, setView] = useState<View>((searchParams.get("view") as View) || "tree");
+
+  useEffect(() => {
+    const v = searchParams.get("view") as View;
+    if (v && v !== view) setView(v);
+  }, [searchParams]);
+
+  const handleSetView = (v: View) => {
+    setView(v);
+    setSearchParams({ view: v });
+  };
   const { members, isLoading } = useFamilyMembers();
 
   const totalMembers = members.length;
@@ -46,7 +57,7 @@ const Index = () => {
           {/* View toggle */}
           <div className="flex rounded-lg border border-border bg-secondary p-1">
             <button
-              onClick={() => setView("tree")}
+              onClick={() => handleSetView("tree")}
               className={`flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-all ${
                 view === "tree"
                   ? "bg-card text-foreground shadow-sm"
@@ -57,7 +68,7 @@ const Index = () => {
               Tree
             </button>
             <button
-              onClick={() => setView("timeline")}
+              onClick={() => handleSetView("timeline")}
               className={`flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-all ${
                 view === "timeline"
                   ? "bg-card text-foreground shadow-sm"
@@ -68,7 +79,7 @@ const Index = () => {
               Timeline
             </button>
             <button
-              onClick={() => setView("map")}
+              onClick={() => handleSetView("map")}
               className={`flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-all ${
                 view === "map"
                   ? "bg-card text-foreground shadow-sm"
