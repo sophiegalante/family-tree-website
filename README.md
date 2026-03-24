@@ -1,73 +1,60 @@
-# Welcome to your Lovable project
+# The Haddock Family Heritage Project
 
-## Project info
+A digital family history website tracing the Haddock family from 12th-century Durham through centuries of farming, faith, and adventure across England and beyond. Dedicated to the memory of **Arthur Haddock**, whose decades of research made this possible.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+## Features
 
-## How can I edit this code?
+- **Family Tree** — Navigate branches and discover connections across generations
+- **Timeline** — Walk through centuries of family history with historical context
+- **Map** — Trace birth and marriage locations across England and beyond
+- **Member Profiles** — Detailed pages for individual family members
+- **Origin of the Name** — The history and etymology of the Haddock surname
+- **Recent Updates** — Live feed of changes pulled from this GitHub repository
 
-There are several ways of editing your application.
+## Tech Stack
 
-**Use Lovable**
+- [React](https://react.dev/) + [TypeScript](https://www.typescriptlang.org/)
+- [Vite](https://vitejs.dev/) — build tool and dev server
+- [Tailwind CSS](https://tailwindcss.com/) + [shadcn/ui](https://ui.shadcn.com/) — styling and components
+- [Supabase](https://supabase.com/) — family member database
+- [TanStack Query](https://tanstack.com/query) — data fetching and caching
+- [React Router](https://reactrouter.com/) — client-side routing
+- [Leaflet](https://leafletjs.com/) — interactive maps
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+## Getting Started
 
-Changes made via Lovable will be committed automatically to this repo.
+### Prerequisites
 
-**Use your preferred IDE**
+- Node.js 18+ and npm
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
+### Setup
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+# Clone the repository
+git clone https://github.com/sophiegalante/family-tree-website.git
+cd family-tree-website
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+# Install dependencies
+npm install
 
-# Step 3: Install the necessary dependencies.
-npm i
+# Create a .env.local file with your credentials
+cp .env.example .env.local
+# Then fill in your Supabase and GitHub token values
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Start the development server
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+The app will be available at `http://localhost:8080`.
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+### Environment Variables
 
-**Use GitHub Codespaces**
+| Variable | Description |
+|---|---|
+| `VITE_SUPABASE_URL` | Your Supabase project URL |
+| `VITE_SUPABASE_ANON_KEY` | Your Supabase anon/public key |
+| `VITE_GITHUB_TOKEN` | GitHub personal access token (needed for private repo) |
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## Data
 
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+Family member data is stored in a Supabase `family_members` table. Historical events are static and defined in `src/data/historicalEvents.ts`.
