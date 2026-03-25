@@ -3,8 +3,8 @@
   "configurations": [
     {
       "name": "Vite Dev Server",
-      "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev"],
+      "runtimeExecutable": "/usr/local/bin/node",
+      "runtimeArgs": ["/Users/sophiegalante/Desktop/Projects/Personal/family-tree-website/node_modules/.bin/vite", "--port", "8080"],
       "port": 8080
     }
   ]
