@@ -4,8 +4,9 @@
     {
       "name": "Vite Dev Server",
       "runtimeExecutable": "/usr/local/bin/node",
-      "runtimeArgs": ["/Users/sophiegalante/Desktop/Projects/Personal/family-tree-website/node_modules/.bin/vite", "--port", "8080"],
-      "port": 8080
+      "runtimeArgs": ["/Users/sophiegalante/Desktop/Projects/Personal/family-tree-website/node_modules/.bin/vite", "--host"],
+      "port": 8080,
+      "autoPort": true
     }
   ]
 }
