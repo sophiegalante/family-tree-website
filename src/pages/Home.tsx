@@ -64,9 +64,9 @@ const Home = () => {
       <section className="container mx-auto px-4 -mt-6 relative z-10">
         <div className="grid gap-4 sm:grid-cols-3">
           {[
-            { icon: GitBranch, label: "Explore the Tree", desc: "Navigate branches, discover connections", to: "/explore" },
-            { icon: Clock, label: "Walk the Timeline", desc: "Follow centuries of family history", to: "/explore" },
-            { icon: MapPin, label: "View the Map", desc: "Trace locations across England & beyond", to: "/explore" },
+            { icon: GitBranch, label: "Explore the Tree", desc: "Navigate branches, discover connections", to: "/explore?view=tree" },
+            { icon: Clock, label: "Walk the Timeline", desc: "Follow centuries of family history", to: "/explore?view=timeline" },
+            { icon: MapPin, label: "View the Map", desc: "Trace locations across England & beyond", to: "/explore?view=map" },
           ].map(({ icon: Icon, label, desc, to }) => (
             <Link
               key={label}
