@@ -5,6 +5,7 @@ import TreeView from "@/components/TreeView";
 import TimelineView from "@/components/TimelineView";
 import MapView from "@/components/MapView";
 import { useFamilyMembers } from "@/hooks/useFamilyMembers";
+import { getBirthYearRange } from "@/lib/memberStats";
 
 type View = "tree" | "timeline" | "map";
 
@@ -24,8 +25,7 @@ const Index = () => {
   const { members, isLoading } = useFamilyMembers();
 
   const totalMembers = members.length;
-  const earliest = members.length ? Math.min(...members.map((m) => m.birthYear)) : 0;
-  const latest = members.length ? Math.max(...members.map((m) => m.birthYear)) : 0;
+  const { earliest, latest } = getBirthYearRange(members);
   const uniqueSurnames = [...new Set(members.map((m) => m.lastName))];
 
   return (

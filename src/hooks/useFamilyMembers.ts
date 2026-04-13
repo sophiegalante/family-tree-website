@@ -95,14 +95,25 @@ function rowToMember(row: FamilyMemberRow): FamilyMember {
   };
 }
 
+export function mapRowsToMembers(rows: FamilyMemberRow[] | undefined): FamilyMember[] {
+  if (!rows || rows.length === 0) {
+    return [];
+  }
+
+  return rows.map(rowToMember);
+}
+
 async function fetchFamilyMembers(): Promise<FamilyMember[]> {
   const { data, error } = await supabase
     .from('family_members')
     .select('*')
     .order('id', { ascending: true });
 
-  if (error) throw new Error(error.message);
-  return (data as FamilyMemberRow[]).map(rowToMember);
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return mapRowsToMembers(data as FamilyMemberRow[] | undefined);
 }
 
 export function useFamilyMembers() {
