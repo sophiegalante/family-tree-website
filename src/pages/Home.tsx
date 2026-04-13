@@ -4,6 +4,7 @@ import { GitBranch, Clock, MapPin, BookOpen, Heart, Feather, ArrowRight, Chevron
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { useFamilyMembers } from "@/hooks/useFamilyMembers";
 import { useGitHubUpdates } from "@/hooks/useGitHubUpdates";
+import { getBirthYearRange } from "@/lib/memberStats";
 
 const Home = () => {
   const { members, isLoading } = useFamilyMembers();
@@ -11,8 +12,7 @@ const Home = () => {
 
   const totalMembers = members.length;
   const uniqueSurnames = [...new Set(members.map((m) => m.lastName))];
-  const earliest = members.length ? Math.min(...members.map((m) => m.birthYear)) : 0;
-  const latest = members.length ? Math.max(...members.map((m) => m.birthYear)) : 0;
+  const { earliest, latest } = getBirthYearRange(members);
   const uniquePlaces = [...new Set(members.map((m) => m.birthPlace).filter(Boolean))];
   const marriages = members.filter((m) => m.marriageDate).length;
 

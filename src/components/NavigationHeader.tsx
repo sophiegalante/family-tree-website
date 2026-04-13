@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { NavLink } from "@/components/NavLink";
-import { GitBranch, Home, Feather, Menu, X, Clock, MapPin, ChevronDown } from "lucide-react";
+import { GitBranch, Home, Feather, Mail, Menu, X, Clock, MapPin, ChevronDown } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import FamilySearch from "@/components/FamilySearch";
 
@@ -12,6 +12,7 @@ const exploreItems = [
 
 const navItems = [
   { label: "Origin of the Name", to: "/origin", icon: Feather },
+  { label: "Contact", to: "/contact", icon: Mail },
 ];
 
 const NavigationHeader = () => {
