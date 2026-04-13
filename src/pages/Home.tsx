@@ -49,7 +49,7 @@ const Home = () => {
               ].map(({ value, label }, i, arr) => (
                 <React.Fragment key={label}>
                   <div className="text-center">
-                    <p className="text-lg font-bold text-foreground">{value}</p>
+                    <p className="whitespace-nowrap text-lg font-bold text-foreground">{value}</p>
                     <p className="text-[10px] uppercase tracking-wider text-muted-foreground">{label}</p>
                   </div>
                   {i < arr.length - 1 && <span className="h-4 w-px bg-border" />}
@@ -85,6 +85,44 @@ const Home = () => {
               </span>
             </Link>
           ))}
+        </div>
+      </section>
+
+      {/* Origin of the Haddock Name — Summary */}
+      <section className="border-t border-border bg-secondary/30 py-8">
+        <div className="container mx-auto px-4">
+          <div className="mx-auto max-w-3xl">
+            <div className="mb-8 flex items-center gap-3">
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent text-accent-foreground">
+                <Feather className="h-4.5 w-4.5" />
+              </div>
+              <h2 className="text-2xl font-semibold text-foreground">
+                Origin of the Haddock Name
+              </h2>
+            </div>
+
+            <div className="space-y-4 text-muted-foreground leading-relaxed">
+              <p>
+                How did the name arise and where did the family originate? The answers are intertwined —
+                the origin of the name and the location go hand in hand. The most familiar association
+                is with the fish, first recorded in 1307, but in farming communities a <em>haddock</em> (or
+                hattock) meant a stook of corn sheaves set to dry.
+              </p>
+              <p>
+                P. H. Reaney's <em>Dictionary of British Surnames</em> traces the Durham branch to a
+                personal name — a diminutive of Old English <em>Aeddi</em> (as found in Bede) with an
+                inorganic H. The earliest records reach back to 1187 in Northumberland and 1209 in the
+                Rotuli Chartarum, spanning Suffolk, Lancashire, Durham, and Yorkshire.
+              </p>
+              <Link
+                to="/origin"
+                className="inline-flex items-center gap-2 text-sm font-medium text-primary hover:text-primary/80 transition-colors"
+              >
+                Read the full history
+                <ArrowRight className="h-3.5 w-3.5" />
+              </Link>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -199,45 +237,6 @@ const Home = () => {
           </div>
         </div>
       </section>
-
-      {/* Origin of the Haddock Name — Summary */}
-      <section className="border-t border-border bg-secondary/30 py-8">
-        <div className="container mx-auto px-4">
-          <div className="mx-auto max-w-3xl">
-            <div className="mb-8 flex items-center gap-3">
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent text-accent-foreground">
-                <Feather className="h-4.5 w-4.5" />
-              </div>
-              <h2 className="text-2xl font-semibold text-foreground">
-                Origin of the Haddock Name
-              </h2>
-            </div>
-
-            <div className="space-y-4 text-muted-foreground leading-relaxed">
-              <p>
-                How did the name arise and where did the family originate? The answers are intertwined —
-                the origin of the name and the location go hand in hand. The most familiar association
-                is with the fish, first recorded in 1307, but in farming communities a <em>haddock</em> (or
-                hattock) meant a stook of corn sheaves set to dry.
-              </p>
-              <p>
-                P. H. Reaney's <em>Dictionary of British Surnames</em> traces the Durham branch to a
-                personal name — a diminutive of Old English <em>Aeddi</em> (as found in Bede) with an
-                inorganic H. The earliest records reach back to 1187 in Northumberland and 1209 in the
-                Rotuli Chartarum, spanning Suffolk, Lancashire, Durham, and Yorkshire.
-              </p>
-              <Link
-                to="/origin"
-                className="inline-flex items-center gap-2 text-sm font-medium text-primary hover:text-primary/80 transition-colors"
-              >
-                Read the full history
-                <ArrowRight className="h-3.5 w-3.5" />
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
-
 
       {/* Footer */}
       <footer className="border-t border-border bg-secondary/30 py-8">

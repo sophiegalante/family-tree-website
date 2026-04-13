@@ -1,8 +1,9 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useFamilyMembers } from "@/hooks/useFamilyMembers";
 import { getEventsForPerson, categoryStyles } from "@/data/historicalEvents";
+import { buildStoryMilestones } from "@/lib/memberStory";
 import {
-  ArrowLeft, User, MapPin, Heart, Users, Church, Scroll, Calendar,
+  ArrowLeft, User, MapPin, Heart, Users, Church, Scroll, Calendar, GitBranch, ArrowRight,
 } from "lucide-react";
 
 export default function MemberProfile() {
@@ -60,6 +61,7 @@ export default function MemberProfile() {
     : presumedDeceased
       ? `${member.birthYear}–unknown`
       : `${member.birthYear}–present`;
+  const milestones = buildStoryMilestones(member);
 
   const events = getEventsForPerson(
     member.birthYear,
@@ -88,46 +90,10 @@ export default function MemberProfile() {
       </header>
 
       <main className="container mx-auto px-4 py-8">
-        <div className="grid gap-8 lg:grid-cols-3">
-          {/* Left column — quick facts */}
-          <div className="space-y-6">
-            {/* Quick facts */}
-            <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
-              <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-                Quick Facts
-              </h3>
-              <div className="space-y-3 text-sm">
-                <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground">Full Name</span>
-                  <span className="font-medium text-card-foreground">
-                    {member.firstName}
-                    {member.middleName ? ` ${member.middleName}` : ""} {member.lastName}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground">Lifespan</span>
-                  <span className="font-medium text-card-foreground">
-                    {lifespanShort}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground">Gender</span>
-                  <span className="font-medium capitalize text-card-foreground">{member.gender}</span>
-                </div>
-                {member.childrenNames.length > 0 && (
-                  <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground">Children</span>
-                    <span className="font-medium text-card-foreground">{member.childrenNames.length}</span>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* Right column — Details */}
-          <div className="space-y-6 lg:col-span-2">
+        <div className="mx-auto max-w-6xl space-y-6">
+          <div className="flex items-center gap-4">
             {/* Name, avatar & lifespan */}
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-4 rounded-2xl border border-border bg-card p-5 shadow-sm w-full">
               {member.photoUrl ? (
                 <img
                   src={member.photoUrl}
@@ -154,24 +120,61 @@ export default function MemberProfile() {
                   <Calendar className="h-4 w-4" />
                   {lifespan}
                 </p>
+                <p className="mt-2 text-xs uppercase tracking-wider text-muted-foreground">
+                  Profile Story View
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
+            <h3 className="mb-4 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+              Story Strip
+            </h3>
+            <div className="grid gap-3 md:grid-cols-4">
+              {milestones.map((milestone, index) => (
+                <div key={milestone.label} className="relative rounded-xl border border-border bg-background p-4">
+                  {index < milestones.length - 1 && (
+                    <ArrowRight className="absolute -right-2 top-1/2 hidden h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground md:block" />
+                  )}
+                  <p className="text-xs uppercase tracking-wider text-muted-foreground">{milestone.label}</p>
+                  <p className={`mt-2 text-sm font-semibold ${milestone.isKnown ? "text-foreground" : "text-muted-foreground"}`}>
+                    {milestone.primary}
+                  </p>
+                  <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">
+                    {milestone.secondary || "No details available"}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="grid gap-6 lg:grid-cols-2">
+            <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+              <h3 className="mb-4 text-lg font-semibold text-card-foreground">Profile Details</h3>
+              <div className="space-y-3 text-sm">
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground">Full Name</span>
+                  <span className="font-medium text-card-foreground">
+                    {member.firstName}
+                    {member.middleName ? ` ${member.middleName}` : ""} {member.lastName}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground">Lifespan</span>
+                  <span className="font-medium text-card-foreground">{lifespanShort}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground">Gender</span>
+                  <span className="font-medium capitalize text-card-foreground">{member.gender}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-muted-foreground">Children</span>
+                  <span className="font-medium text-card-foreground">{member.childrenNames.length || "Unknown"}</span>
+                </div>
               </div>
             </div>
 
-            {/* Biography */}
-            <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
-              <h3 className="mb-3 text-lg font-semibold text-card-foreground">Biography</h3>
-              {member.biography ? (
-                <p className="leading-relaxed text-muted-foreground">{member.biography}</p>
-              ) : (
-                <p className="italic text-muted-foreground/60">
-                  No biography has been written yet. This section will hold a longer narrative about{" "}
-                  {member.firstName}'s life, including their occupation, notable achievements, and
-                  family stories passed down through generations.
-                </p>
-              )}
-            </div>
-
-            {/* Life details */}
             <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
               <h3 className="mb-4 text-lg font-semibold text-card-foreground">Life Details</h3>
               <div className="space-y-3">
@@ -230,48 +233,78 @@ export default function MemberProfile() {
                 )}
               </div>
             </div>
+          </div>
 
-            {/* Historical Events */}
-            {events.length > 0 && (
-              <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
-                <div className="mb-4 flex items-center gap-2">
-                  <Scroll className="h-5 w-5 text-primary" />
-                  <h3 className="text-lg font-semibold text-card-foreground">
-                    Historical Context
-                  </h3>
-                </div>
-                <div className="grid gap-3 sm:grid-cols-2">
-                  {events.map((event) => {
-                    const style = categoryStyles[event.category];
-                    return (
-                      <div
-                        key={event.name}
-                        className="rounded-xl bg-secondary/50 px-4 py-3"
-                      >
-                        <div className="flex items-start gap-2">
-                          <span className="mt-0.5 text-base">{style.emoji}</span>
-                          <div className="min-w-0">
-                            <p className="text-sm font-medium text-card-foreground">
-                              {event.name}
-                            </p>
-                            <p className="text-xs text-muted-foreground">
-                              {event.year}
-                              {event.endYear && event.endYear !== event.year
-                                ? `–${event.endYear}`
-                                : ""}
-                            </p>
-                            <p className="mt-1 text-xs text-muted-foreground">
-                              {event.description}
-                            </p>
-                          </div>
+          <div className="grid gap-6 lg:grid-cols-2">
+            {/* Biography */}
+            <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+              <h3 className="mb-3 text-lg font-semibold text-card-foreground">Biography</h3>
+              {member.biography ? (
+                <p className="leading-relaxed text-muted-foreground">{member.biography}</p>
+              ) : (
+                <p className="italic text-muted-foreground/60">
+                  No biography has been written yet. This section will hold a longer narrative about{" "}
+                  {member.firstName}'s life, including their occupation, notable achievements, and
+                  family stories passed down through generations.
+                </p>
+              )}
+            </div>
+
+            <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+              <h3 className="mb-3 text-lg font-semibold text-card-foreground">Family Connections</h3>
+              <p className="text-sm text-muted-foreground">
+                Use the tree explorer to view this member's branch and related family connections.
+              </p>
+              <button
+                onClick={() => navigate("/explore?view=tree")}
+                className="mt-4 inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+              >
+                <GitBranch className="h-4 w-4" />
+                View Related Branch
+              </button>
+            </div>
+          </div>
+
+          {/* Historical Events */}
+          {events.length > 0 && (
+            <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+              <div className="mb-4 flex items-center gap-2">
+                <Scroll className="h-5 w-5 text-primary" />
+                <h3 className="text-lg font-semibold text-card-foreground">
+                  Historical Context
+                </h3>
+              </div>
+              <div className="grid gap-3 sm:grid-cols-2">
+                {events.map((event) => {
+                  const style = categoryStyles[event.category];
+                  return (
+                    <div
+                      key={event.name}
+                      className="rounded-xl bg-secondary/50 px-4 py-3"
+                    >
+                      <div className="flex items-start gap-2">
+                        <span className="mt-0.5 text-base">{style.emoji}</span>
+                        <div className="min-w-0">
+                          <p className="text-sm font-medium text-card-foreground">
+                            {event.name}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {event.year}
+                            {event.endYear && event.endYear !== event.year
+                              ? `–${event.endYear}`
+                              : ""}
+                          </p>
+                          <p className="mt-1 text-xs text-muted-foreground">
+                            {event.description}
+                          </p>
                         </div>
                       </div>
-                    );
-                  })}
-                </div>
+                    </div>
+                  );
+                })}
               </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       </main>
     </div>
