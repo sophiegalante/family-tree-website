@@ -1,6 +1,6 @@
 export interface FamilyMember {
   id: string;
-  pageId: "p1" | "p2" | "p3" | "p4";
+  pageId: "p1" | "p2" | "p3" | "p4" | "p5" | "p6" | "p7";
   commonName: string;
   firstName: string;
   middleName?: string;
@@ -306,21 +306,23 @@ export function getEras(members: FamilyMember[]): Era[] {
 
 // Get family branches (by page)
 export function getBranches(members: FamilyMember[]): { label: string; pageId: string; rootMember: FamilyMember }[] {
-  const pages = ["p1", "p2", "p3", "p4"];
+  const pages = ["p1", "p2", "p3", "p4", "p5", "p6", "p7"];
   const labels = [
-    "Henderson / Sowerby / Chilton Branch",
-    "Moses / Mosey Branch",
-    "Ainsley / Smailes / Stiff Branch",
-    "Haddock / Stones Branch",
+    "Haddock and Henderson",
+    "Henderson and Mosey",
+    "Haddock and Ainsley",
+    "Haddock and Stones",
+    "Priestman and Patton",
+    "Priestman and Wilson",
+    "Priestman and Moses",
   ];
-  return pages.map((pageId, i) => {
-    const branchMembers = members.filter((m) => m.pageId === pageId);
-    return {
-      label: labels[i],
-      pageId,
-      rootMember: branchMembers[0],
-    };
-  });
+  return pages
+    .map((pageId, i) => {
+      const branchMembers = members.filter((m) => m.pageId === pageId);
+      if (branchMembers.length === 0) return null;
+      return { label: labels[i], pageId, rootMember: branchMembers[0] };
+    })
+    .filter(Boolean) as { label: string; pageId: string; rootMember: FamilyMember }[];
 }
 
 // Get members by page

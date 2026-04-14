@@ -3,7 +3,7 @@ import { useFamilyMembers } from "@/hooks/useFamilyMembers";
 import { getEventsForPerson, categoryStyles } from "@/data/historicalEvents";
 import { buildStoryMilestones } from "@/lib/memberStory";
 import {
-  ArrowLeft, User, MapPin, Heart, Users, Church, Scroll, Calendar, GitBranch, ArrowRight,
+  ArrowLeft, User, MapPin, Heart, Users, Church, Scroll, Calendar, ArrowRight,
 } from "lucide-react";
 
 export default function MemberProfile() {
@@ -25,7 +25,7 @@ export default function MemberProfile() {
         <div className="text-center space-y-4">
           <p className="text-xl text-muted-foreground">Failed to load family data</p>
           <button onClick={() => navigate("/")} className="text-primary underline">
-            Back to Family Tree
+            Back to Explore
           </button>
         </div>
       </div>
@@ -40,7 +40,7 @@ export default function MemberProfile() {
         <div className="text-center space-y-4">
           <p className="text-xl text-muted-foreground">Member not found</p>
           <button onClick={() => navigate("/")} className="text-primary underline">
-            Back to Family Tree
+            Back to Explore
           </button>
         </div>
       </div>
@@ -250,19 +250,6 @@ export default function MemberProfile() {
               )}
             </div>
 
-            <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
-              <h3 className="mb-3 text-lg font-semibold text-card-foreground">Family Connections</h3>
-              <p className="text-sm text-muted-foreground">
-                Use the tree explorer to view this member's branch and related family connections.
-              </p>
-              <button
-                onClick={() => navigate("/explore?view=tree")}
-                className="mt-4 inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
-              >
-                <GitBranch className="h-4 w-4" />
-                View Related Branch
-              </button>
-            </div>
           </div>
 
           {/* Historical Events */}

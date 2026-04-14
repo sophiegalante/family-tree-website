@@ -5,7 +5,6 @@ import { useState, useRef, useEffect } from "react";
 import FamilySearch from "@/components/FamilySearch";
 
 const exploreItems = [
-  { label: "Tree", to: "/explore?view=tree", icon: GitBranch },
   { label: "Timeline", to: "/explore?view=timeline", icon: Clock },
   { label: "Map", to: "/explore?view=map", icon: MapPin },
 ];

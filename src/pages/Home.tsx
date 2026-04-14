@@ -49,7 +49,7 @@ const Home = () => {
               ].map(({ value, label }, i, arr) => (
                 <React.Fragment key={label}>
                   <div className="text-center">
-                    <p className="whitespace-nowrap text-lg font-bold text-foreground">{value}</p>
+                    <p className="whitespace-nowrap text-sm sm:text-base lg:text-lg font-bold text-foreground">{value}</p>
                     <p className="text-[10px] uppercase tracking-wider text-muted-foreground">{label}</p>
                   </div>
                   {i < arr.length - 1 && <span className="h-4 w-px bg-border" />}
@@ -63,8 +63,19 @@ const Home = () => {
       {/* Explore CTAs */}
       <section className="container mx-auto px-4 -mt-6 relative z-10">
         <div className="grid gap-4 sm:grid-cols-3">
+          {/* Tree — coming soon */}
+          <div className="flex flex-col items-center gap-3 rounded-xl border border-border bg-card/50 p-6 text-center opacity-60 cursor-default">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary">
+              <GitBranch className="h-5 w-5" />
+            </div>
+            <div>
+              <p className="font-semibold text-foreground">Explore the Tree</p>
+              <p className="mt-1 text-sm text-muted-foreground">Navigate branches, discover connections</p>
+            </div>
+            <span className="mt-1 text-xs font-medium text-muted-foreground">Coming soon!</span>
+          </div>
+
           {[
-            { icon: GitBranch, label: "Explore the Tree", desc: "Navigate branches, discover connections", to: "/explore?view=tree" },
             { icon: Clock, label: "Walk the Timeline", desc: "Follow centuries of family history", to: "/explore?view=timeline" },
             { icon: MapPin, label: "View the Map", desc: "Trace locations across England & beyond", to: "/explore?view=map" },
           ].map(({ icon: Icon, label, desc, to }) => (

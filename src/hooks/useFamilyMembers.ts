@@ -27,10 +27,13 @@ interface FamilyMemberRow {
 
 // Maps the family_line string from Supabase to our page IDs
 const familyLineToPageId: Record<string, FamilyMember['pageId']> = {
-  'App 2 - Haddock-Henderson':  'p1',
-  'App 2.1 - Henderson-Mosey': 'p2',
-  'App 3 - Haddock-Ainsley':   'p3',
-  'App 4 - Haddock-Stones':    'p4',
+  'Haddock and Henderson':  'p1',
+  'Henderson and Mosey':    'p2',
+  'Haddock and Ainsley':    'p3',
+  'Haddock and Stones':     'p4',
+  'Priestman and Patton':   'p5',
+  'Priestman and Wilson':   'p6',
+  'Priestman and Moses':    'p7',
 };
 
 const femaleNames = new Set([

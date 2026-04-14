@@ -1,17 +1,16 @@
 import { useState, useEffect } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { GitBranch, Clock, MapPin, Users, Home } from "lucide-react";
-import TreeView from "@/components/TreeView";
+import { Clock, MapPin, Users, Home } from "lucide-react";
 import TimelineView from "@/components/TimelineView";
 import MapView from "@/components/MapView";
 import { useFamilyMembers } from "@/hooks/useFamilyMembers";
 import { getBirthYearRange } from "@/lib/memberStats";
 
-type View = "tree" | "timeline" | "map";
+type View = "timeline" | "map";
 
 const Index = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const [view, setView] = useState<View>((searchParams.get("view") as View) || "tree");
+  const [view, setView] = useState<View>((searchParams.get("view") as View) || "timeline");
 
   useEffect(() => {
     const v = searchParams.get("view") as View;
@@ -57,17 +56,6 @@ const Index = () => {
           {/* View toggle */}
           <div className="flex rounded-lg border border-border bg-secondary p-1">
             <button
-              onClick={() => handleSetView("tree")}
-              className={`flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-all ${
-                view === "tree"
-                  ? "bg-card text-foreground shadow-sm"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              <GitBranch className="h-4 w-4" />
-              Tree
-            </button>
-            <button
               onClick={() => handleSetView("timeline")}
               className={`flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-all ${
                 view === "timeline"
@@ -95,7 +83,7 @@ const Index = () => {
 
       {/* Content */}
       <main className="container mx-auto px-4 py-8">
-        {view === "tree" ? <TreeView /> : view === "timeline" ? <TimelineView /> : <MapView />}
+        {view === "timeline" ? <TimelineView /> : <MapView />}
       </main>
     </div>
   );
