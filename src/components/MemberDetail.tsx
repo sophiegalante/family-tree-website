@@ -1,15 +1,22 @@
 import { useNavigate } from "react-router-dom";
 import type { FamilyMember } from "@/data/familyData";
+import { findMemberByName } from "@/data/familyData";
 import { getEventsForPerson, categoryStyles } from "@/data/historicalEvents";
 import { X, User, MapPin, Heart, Users, Church, Scroll, ExternalLink } from "lucide-react";
 
 interface MemberDetailProps {
   member: FamilyMember;
   onClose: () => void;
+  members?: FamilyMember[];
 }
 
-export default function MemberDetail({ member, onClose }: MemberDetailProps) {
+export default function MemberDetail({ member, onClose, members = [] }: MemberDetailProps) {
   const navigate = useNavigate();
+
+  function goToMember(name: string) {
+    const linked = findMemberByName(name, members);
+    if (linked) { onClose(); navigate(`/member/${linked.id}`); }
+  }
   const lifespan = member.deathYear
     ? `${member.birthDate} – ${member.deathDate}`
     : `${member.birthDate} – present`;
@@ -74,7 +81,12 @@ export default function MemberDetail({ member, onClose }: MemberDetailProps) {
             <div className="flex items-center gap-3 text-sm">
               <Heart className="h-4 w-4 shrink-0 text-muted-foreground" />
               <span className="text-card-foreground">
-                Married {member.spouseName}
+                Married{" "}
+                {findMemberByName(member.spouseName, members) ? (
+                  <button onClick={() => goToMember(member.spouseName!)} className="text-primary underline-offset-2 hover:underline">
+                    {member.spouseName}
+                  </button>
+                ) : member.spouseName}
                 {member.marriageDate ? `, ${member.marriageDate}` : ""}
                 {member.marriagePlace ? ` in ${member.marriagePlace}` : ""}
               </span>
@@ -84,8 +96,19 @@ export default function MemberDetail({ member, onClose }: MemberDetailProps) {
             <div className="flex items-center gap-3 text-sm">
               <Users className="h-4 w-4 shrink-0 text-muted-foreground" />
               <span className="text-card-foreground">
-                Parents: {member.parent1Name}
-                {member.parent2Name ? ` & ${member.parent2Name}` : ""}
+                Parents:{" "}
+                {findMemberByName(member.parent1Name, members) ? (
+                  <button onClick={() => goToMember(member.parent1Name!)} className="text-primary underline-offset-2 hover:underline">
+                    {member.parent1Name}
+                  </button>
+                ) : member.parent1Name}
+                {member.parent2Name && (
+                  <>{" & "}{findMemberByName(member.parent2Name, members) ? (
+                    <button onClick={() => goToMember(member.parent2Name!)} className="text-primary underline-offset-2 hover:underline">
+                      {member.parent2Name}
+                    </button>
+                  ) : member.parent2Name}</>
+                )}
               </span>
             </div>
           )}
@@ -98,7 +121,13 @@ export default function MemberDetail({ member, onClose }: MemberDetailProps) {
                 </span>
                 <ul className="mt-1 space-y-0.5">
                   {member.childrenNames.map((c) => (
-                    <li key={c} className="text-muted-foreground">{c}</li>
+                    <li key={c} className="text-muted-foreground">
+                      {findMemberByName(c, members) ? (
+                        <button onClick={() => goToMember(c)} className="text-primary underline-offset-2 hover:underline">
+                          {c}
+                        </button>
+                      ) : c}
+                    </li>
                   ))}
                 </ul>
               </div>

@@ -295,7 +295,7 @@ export default function MapView() {
       </div>
 
       {selected && (
-        <MemberDetail member={selected} onClose={() => setSelected(null)} />
+        <MemberDetail member={selected} onClose={() => setSelected(null)} members={members} />
       )}
     </div>
   );

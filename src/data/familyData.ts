@@ -329,3 +329,44 @@ export function getBranches(members: FamilyMember[]): { label: string; pageId: s
 export function getMembersByBranch(members: FamilyMember[], pageId: string): FamilyMember[] {
   return members.filter((m) => m.pageId === pageId);
 }
+
+// Find a member by plain name (e.g. "Jacob Henderson") — matches firstName+lastName
+// or the base of commonName (stripping the date part). Returns undefined if not found
+// or if multiple members match (ambiguous).
+export function findMemberByName(name: string, members: FamilyMember[]): FamilyMember | undefined {
+  if (!name) return undefined;
+  const trimmed = name.trim();
+  // Extract birth year from date like " (1803-1859)" or " (1803-)" if present
+  const dateMatch = trimmed.match(/\((\d{4})[–\-]?\d*\)$/);
+  const birthYearHint = dateMatch ? parseInt(dateMatch[1]) : undefined;
+  // Strip the trailing date to get the base name
+  const stripped = trimmed.replace(/\s*\(\d{4}[–\-]?\d*\)$/, '').trim();
+  const normalized = stripped.toLowerCase();
+
+  const matches = members.filter((m) => {
+    const fullName = `${m.firstName} ${m.lastName}`.toLowerCase();
+    if (fullName === normalized) return true;
+    // commonName is like "Jacob Henderson (1796-1856)" — strip the date part
+    const commonBase = m.commonName.split(' (')[0].toLowerCase();
+    if (commonBase === normalized) return true;
+    // firstName may include a nickname like `Tabitha "Tibby"` — strip it
+    const firstNoNick = m.firstName.replace(/"[^"]*"/g, '').trim();
+    const nameNoNick = `${firstNoNick} ${m.lastName}`.toLowerCase().replace(/\s+/g, ' ');
+    if (nameNoNick === normalized) return true;
+    return false;
+  });
+
+  if (matches.length === 1) return matches[0];
+  if (matches.length > 1) {
+    // Use birth year to narrow down if the name included a date
+    const candidates = birthYearHint !== undefined
+      ? matches.filter((m) => m.birthYear === birthYearHint)
+      : matches;
+    const pool = candidates.length > 0 ? candidates : matches;
+    // If all remaining candidates share the same birth year they're the same person
+    // duplicated across branches — just pick the first
+    const allSame = pool.every((m) => m.birthYear === pool[0].birthYear);
+    if (allSame) return pool[0];
+  }
+  return undefined;
+}

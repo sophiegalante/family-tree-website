@@ -1,10 +1,26 @@
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { useFamilyMembers } from "@/hooks/useFamilyMembers";
 import { getEventsForPerson, categoryStyles } from "@/data/historicalEvents";
 import { buildStoryMilestones } from "@/lib/memberStory";
+import { findMemberByName, type FamilyMember } from "@/data/familyData";
 import {
   ArrowLeft, User, MapPin, Heart, Users, Church, Scroll, Calendar, ArrowRight,
 } from "lucide-react";
+
+function MemberLink({ name, members }: { name: string; members: FamilyMember[] }) {
+  const linked = findMemberByName(name, members);
+  if (linked) {
+    return (
+      <Link
+        to={`/member/${linked.id}`}
+        className="text-primary underline-offset-2 hover:underline"
+      >
+        {name}
+      </Link>
+    );
+  }
+  return <>{name}</>;
+}
 
 export default function MemberProfile() {
   const { id } = useParams<{ id: string }>();
@@ -203,7 +219,7 @@ export default function MemberProfile() {
                   <div className="flex items-center gap-3 text-sm">
                     <Heart className="h-4 w-4 shrink-0 text-pink-500" />
                     <span className="text-card-foreground">
-                      Married {member.spouseName}
+                      Married <MemberLink name={member.spouseName} members={members} />
                       {member.marriageDate ? `, ${member.marriageDate}` : ""}
                       {member.marriagePlace ? ` in ${member.marriagePlace}` : ""}
                     </span>
@@ -213,8 +229,8 @@ export default function MemberProfile() {
                   <div className="flex items-center gap-3 text-sm">
                     <Users className="h-4 w-4 shrink-0 text-muted-foreground" />
                     <span className="text-card-foreground">
-                      Parents: {member.parent1Name}
-                      {member.parent2Name ? ` & ${member.parent2Name}` : ""}
+                      Parents: <MemberLink name={member.parent1Name} members={members} />
+                      {member.parent2Name ? <> & <MemberLink name={member.parent2Name} members={members} /></> : ""}
                     </span>
                   </div>
                 )}
@@ -225,7 +241,9 @@ export default function MemberProfile() {
                       <span className="font-medium text-card-foreground">Children:</span>
                       <ul className="mt-1 columns-2 gap-x-6 space-y-0.5">
                         {member.childrenNames.map((c) => (
-                          <li key={c} className="text-muted-foreground">{c}</li>
+                          <li key={c} className="text-muted-foreground">
+                            <MemberLink name={c} members={members} />
+                          </li>
                         ))}
                       </ul>
                     </div>

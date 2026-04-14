@@ -247,7 +247,7 @@ export default function TimelineView() {
         </div>
       )}
 
-      {selected && <MemberDetail member={selected} onClose={() => setSelected(null)} />}
+      {selected && <MemberDetail member={selected} onClose={() => setSelected(null)} members={members} />}
     </div>
   );
 }
