@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { Link } from "react-router-dom";
 import { GitBranch, Clock, MapPin, BookOpen, Heart, Feather, ArrowRight, ChevronDown, Users, Calendar, Church } from "lucide-react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
@@ -9,6 +9,61 @@ import { getBirthYearRange } from "@/lib/memberStats";
 const Home = () => {
   const { members, isLoading } = useFamilyMembers();
   const { data: githubUpdates, isLoading: updatesLoading } = useGitHubUpdates();
+
+  // "On this day" — events matching today's month and day
+  const onThisDayEvents = useMemo(() => {
+    const today = new Date();
+    const todayMonth = today.getMonth(); // 0-indexed
+    const todayDay = today.getDate();
+
+    const monthNames: Record<string, number> = {
+      january: 0, february: 1, march: 2, april: 3, may: 4, june: 5,
+      july: 6, august: 7, september: 8, october: 9, november: 10, december: 11,
+    };
+
+    function parseDate(str: string | undefined): Date | null {
+      if (!str) return null;
+      const m = str.match(/^(\d{1,2})\s+(\w+)\s+(\d{4})$/i);
+      if (m) {
+        const month = monthNames[m[2].toLowerCase()];
+        if (month !== undefined) return new Date(parseInt(m[3]), month, parseInt(m[1]));
+      }
+      const d = new Date(str);
+      return isNaN(d.getTime()) ? null : d;
+    }
+
+    function matches(str: string | undefined) {
+      const d = parseDate(str);
+      return d && d.getMonth() === todayMonth && d.getDate() === todayDay;
+    }
+
+    type EventEntry = { memberId: string; name: string; type: string; year: number; detail: string; color: string };
+    const events: EventEntry[] = [];
+
+    for (const m of members) {
+      const name = `${m.firstName} ${m.lastName}`;
+      if (matches(m.birthDate)) {
+        const year = parseDate(m.birthDate)!.getFullYear();
+        events.push({ memberId: m.id, name, type: "Born", year, detail: m.birthPlace ?? "", color: "text-green-600 bg-green-50" });
+      }
+      if (matches(m.deathDate)) {
+        const year = parseDate(m.deathDate)!.getFullYear();
+        events.push({ memberId: m.id, name, type: "Died", year, detail: m.deathPlace ?? "", color: "text-slate-500 bg-slate-100" });
+      }
+      if (matches(m.marriageDate)) {
+        const year = parseDate(m.marriageDate)!.getFullYear();
+        events.push({ memberId: m.id, name, type: "Married", year, detail: m.spouseName ? `to ${m.spouseName}` : (m.marriagePlace ?? ""), color: "text-pink-600 bg-pink-50" });
+      }
+      if (matches(m.baptismDate)) {
+        const year = parseDate(m.baptismDate)!.getFullYear();
+        events.push({ memberId: m.id, name, type: "Baptised", year, detail: m.baptismPlace ?? "", color: "text-blue-600 bg-blue-50" });
+      }
+    }
+
+    return events.sort((a, b) => a.year - b.year);
+  }, [members]);
+
+  const todayLabel = new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long" });
 
   const totalMembers = members.length;
   const uniqueSurnames = [...new Set(members.map((m) => m.lastName))];
@@ -32,7 +87,7 @@ const Home = () => {
               The Haddock Family
             </h1>
             <p className="mx-auto mt-6 max-w-xl text-lg text-muted-foreground leading-relaxed">
-              Tracing our roots from 12th-century Durham through centuries of farming,
+              Tracing our roots from 16th-century Durham through centuries of farming,
               faith, and adventure — across England and beyond.
             </p>
             <div className="mt-10 rounded-xl sm:rounded-full border border-border bg-card/60 px-6 py-4 sm:px-8 sm:inline-flex sm:items-center sm:gap-10">
@@ -66,15 +121,17 @@ const Home = () => {
       <section className="container mx-auto px-4 -mt-6 relative z-10">
         <div className="grid gap-4 sm:grid-cols-3">
           {/* Tree — coming soon */}
-          <div className="flex flex-col items-center gap-3 rounded-xl border border-border bg-card p-6 text-center opacity-60 cursor-default">
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary">
+          <div className="flex flex-col items-center gap-3 rounded-xl border border-dashed border-border bg-card p-6 text-center cursor-default">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary/40">
               <GitBranch className="h-5 w-5" />
             </div>
             <div>
-              <p className="font-semibold text-foreground">Explore the Tree</p>
-              <p className="mt-1 text-sm text-muted-foreground">Navigate branches, discover connections</p>
+              <p className="font-semibold text-foreground/50">Explore the Tree</p>
+              <p className="mt-1 text-sm text-muted-foreground/50">Navigate branches, discover connections</p>
             </div>
-            <span className="mt-1 text-xs font-medium text-muted-foreground">Coming soon!</span>
+            <span className="mt-1 inline-flex items-center gap-1.5 rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-700">
+              Coming soon
+            </span>
           </div>
 
           {[
@@ -84,7 +141,7 @@ const Home = () => {
             <Link
               key={label}
               to={to}
-              className="group flex flex-col items-center gap-3 rounded-xl border border-border bg-card p-6 text-center shadow-sm transition-all hover:shadow-lg hover:border-primary/40 hover:-translate-y-0.5"
+              className="group flex flex-col items-center gap-3 rounded-xl border border-border bg-card p-6 text-center shadow-md transition-all hover:shadow-xl hover:border-primary/40 hover:-translate-y-1 cursor-pointer"
             >
               <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
                 <Icon className="h-5 w-5" />
@@ -93,13 +150,54 @@ const Home = () => {
                 <p className="font-semibold text-foreground">{label}</p>
                 <p className="mt-1 text-sm text-muted-foreground">{desc}</p>
               </div>
-              <span className="mt-1 inline-flex items-center gap-1 text-xs font-medium text-primary opacity-0 transition-opacity group-hover:opacity-100">
+              <span className="mt-1 inline-flex items-center gap-1 text-xs font-medium text-primary">
                 Go <ArrowRight className="h-3 w-3" />
               </span>
             </Link>
           ))}
         </div>
       </section>
+
+      {/* On this day */}
+      {!isLoading && (
+        <section className="border-t border-border py-8 mt-6">
+          <div className="container mx-auto px-4">
+            <div className="mx-auto max-w-3xl">
+              <div className="mb-6 flex items-center gap-3">
+                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent text-accent-foreground">
+                  <Calendar className="h-4.5 w-4.5" />
+                </div>
+                <div>
+                  <h2 className="text-2xl font-semibold text-foreground">On this day…</h2>
+                  <p className="text-sm text-muted-foreground">{todayLabel}</p>
+                </div>
+              </div>
+              {onThisDayEvents.length === 0 ? (
+                <p className="text-sm text-muted-foreground italic">No recorded family events on this date.</p>
+              ) : (
+                <div className="space-y-3">
+                  {onThisDayEvents.map((event, i) => (
+                    <Link
+                      key={i}
+                      to={`/member/${event.memberId}`}
+                      className="flex items-center gap-4 rounded-lg border border-border bg-card p-4 transition-colors hover:border-primary/40 hover:bg-accent/30"
+                    >
+                      <span className={`shrink-0 rounded-md px-2.5 py-1 text-xs font-semibold ${event.color}`}>
+                        {event.type}
+                      </span>
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium text-foreground">{event.name}</p>
+                        {event.detail && <p className="text-xs text-muted-foreground truncate">{event.detail}</p>}
+                      </div>
+                      <span className="ml-auto shrink-0 text-sm font-medium text-muted-foreground">{event.year}</span>
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Origin of the Haddock Name — Summary */}
       <section className="border-t border-border bg-secondary/30 py-8">
@@ -120,12 +218,6 @@ const Home = () => {
                 the origin of the name and the location go hand in hand. The most familiar association
                 is with the fish, first recorded in 1307, but in farming communities a <em>haddock</em> (or
                 hattock) meant a stook of corn sheaves set to dry.
-              </p>
-              <p>
-                P. H. Reaney's <em>Dictionary of British Surnames</em> traces the Durham branch to a
-                personal name — a diminutive of Old English <em>Aeddi</em> (as found in Bede) with an
-                inorganic H. The earliest records reach back to 1187 in Northumberland and 1209 in the
-                Rotuli Chartarum, spanning Suffolk, Lancashire, Durham, and Yorkshire.
               </p>
               <Link
                 to="/origin"
@@ -152,8 +244,8 @@ const Home = () => {
               </h2>
             </div>
 
-            <div className="rounded-xl border border-border bg-card p-6 sm:p-8">
-              <p className="mb-6 text-muted-foreground leading-relaxed">
+            <div className="space-y-4">
+              <p className="text-muted-foreground leading-relaxed">
                 This project is dedicated to the memory of <strong className="text-foreground">Arthur Haddock</strong>,
                 whose lifelong passion for family history made all of this possible. Arthur traced
                 records across the globe — from the parish churches and county archives of Durham,
@@ -164,7 +256,7 @@ const Home = () => {
                 is built.
               </p>
 
-              <p className="mb-4 text-sm text-muted-foreground leading-relaxed">
+              <p className="text-sm text-muted-foreground leading-relaxed">
                 His brother, Dr Ernest Haddock, wrote the following poem in 1991 as a tribute to
                 Arthur's lifelong dedication to uncovering the family's past.
               </p>

@@ -4,7 +4,7 @@ import { getEventsForPerson, categoryStyles } from "@/data/historicalEvents";
 import { buildStoryMilestones } from "@/lib/memberStory";
 import { findMemberByName, type FamilyMember } from "@/data/familyData";
 import {
-  ArrowLeft, User, MapPin, Heart, Users, Church, Scroll, Calendar, ArrowRight,
+  ArrowLeft, User, MapPin, Heart, Users, Church, Scroll, Calendar, ArrowRight, ImageIcon,
 } from "lucide-react";
 
 function MemberLink({ name, members }: { name: string; members: FamilyMember[] }) {
@@ -268,6 +268,26 @@ export default function MemberProfile() {
               )}
             </div>
 
+            {/* Photos */}
+            <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+              <div className="mb-4 flex items-center gap-2">
+                <ImageIcon className="h-5 w-5 text-muted-foreground" />
+                <h3 className="text-lg font-semibold text-card-foreground">Photos</h3>
+              </div>
+              <div className="grid grid-cols-3 gap-3">
+                {[0, 1, 2].map((i) => (
+                  <div
+                    key={i}
+                    className="aspect-square rounded-xl border-2 border-dashed border-border bg-secondary/30 flex flex-col items-center justify-center gap-1 text-muted-foreground/50"
+                  >
+                    <ImageIcon className="h-6 w-6" />
+                  </div>
+                ))}
+              </div>
+              <p className="mt-3 text-xs italic text-muted-foreground/50">
+                Photos coming soon
+              </p>
+            </div>
           </div>
 
           {/* Historical Events */}
