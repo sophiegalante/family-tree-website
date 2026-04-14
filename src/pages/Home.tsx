@@ -35,26 +35,28 @@ const Home = () => {
               Tracing our roots from 12th-century Durham through centuries of farming,
               faith, and adventure — across England and beyond.
             </p>
-            <div className="mt-10 inline-flex items-center gap-6 sm:gap-10 rounded-full border border-border bg-card/60 px-8 py-4">
-              <div className="flex items-center gap-2 text-muted-foreground">
+            <div className="mt-10 rounded-xl sm:rounded-full border border-border bg-card/60 px-6 py-4 sm:px-8 sm:inline-flex sm:items-center sm:gap-10">
+              <div className="flex items-center gap-2 text-muted-foreground justify-center mb-3 sm:mb-0">
                 <Users className="h-4 w-4 text-primary" />
                 <span className="text-sm font-medium">Family Statistics</span>
               </div>
-              <span className="h-4 w-px bg-border" />
-              {[
-                { value: isLoading ? "…" : totalMembers, label: "Members" },
-                { value: isLoading ? "…" : `${earliest}–${latest}`, label: "Timespan" },
-                { value: isLoading ? "…" : uniquePlaces.length, label: "Locations" },
-                { value: isLoading ? "…" : marriages, label: "Marriages" },
-              ].map(({ value, label }, i, arr) => (
-                <React.Fragment key={label}>
-                  <div className="text-center">
-                    <p className="whitespace-nowrap text-sm sm:text-base lg:text-lg font-bold text-foreground">{value}</p>
-                    <p className="text-[10px] uppercase tracking-wider text-muted-foreground">{label}</p>
-                  </div>
-                  {i < arr.length - 1 && <span className="h-4 w-px bg-border" />}
-                </React.Fragment>
-              ))}
+              <span className="hidden sm:block h-4 w-px bg-border" />
+              <div className="grid grid-cols-2 gap-4 sm:flex sm:items-center sm:gap-10">
+                {[
+                  { value: isLoading ? "…" : totalMembers, label: "Members" },
+                  { value: isLoading ? "…" : `${earliest}–${latest}`, label: "Timespan" },
+                  { value: isLoading ? "…" : uniquePlaces.length, label: "Locations" },
+                  { value: isLoading ? "…" : marriages, label: "Marriages" },
+                ].map(({ value, label }, i, arr) => (
+                  <React.Fragment key={label}>
+                    <div className="text-center">
+                      <p className="whitespace-nowrap text-sm sm:text-base lg:text-lg font-bold text-foreground">{value}</p>
+                      <p className="text-[10px] uppercase tracking-wider text-muted-foreground">{label}</p>
+                    </div>
+                    {i < arr.length - 1 && <span className="hidden sm:block h-4 w-px bg-border" />}
+                  </React.Fragment>
+                ))}
+              </div>
             </div>
           </div>
         </div>
@@ -64,7 +66,7 @@ const Home = () => {
       <section className="container mx-auto px-4 -mt-6 relative z-10">
         <div className="grid gap-4 sm:grid-cols-3">
           {/* Tree — coming soon */}
-          <div className="flex flex-col items-center gap-3 rounded-xl border border-border bg-card/50 p-6 text-center opacity-60 cursor-default">
+          <div className="flex flex-col items-center gap-3 rounded-xl border border-border bg-card p-6 text-center opacity-60 cursor-default">
             <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary">
               <GitBranch className="h-5 w-5" />
             </div>
