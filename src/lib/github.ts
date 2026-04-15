@@ -16,8 +16,6 @@ function formatDate(iso: string): string {
 
 export async function fetchRecentUpdates(limit = 5): Promise<GitHubUpdate[]> {
   const headers: Record<string, string> = { Accept: "application/vnd.github+json" };
-  const token = import.meta.env.VITE_GITHUB_TOKEN;
-  if (token) headers["Authorization"] = `Bearer ${token}`;
 
   const [commitsRes, prsRes] = await Promise.all([
     fetch(`${API}/repos/${REPO}/commits?per_page=${limit}`, { headers }),

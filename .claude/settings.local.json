@@ -16,7 +16,9 @@
       "Bash(/usr/local/bin/node /usr/local/bin/npm install @xyflow/react @dagrejs/dagre)",
       "Bash(/usr/local/bin/node /usr/local/bin/npm list @xyflow/react @dagrejs/dagre)",
       "Bash(git fetch:*)",
-      "Bash(npm run:*)"
+      "Bash(npm run:*)",
+      "Bash(git merge:*)",
+      "Bash(git stash:*)"
     ]
   },
   "enableAllProjectMcpServers": true,
