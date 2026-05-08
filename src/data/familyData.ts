@@ -1,6 +1,6 @@
 export interface FamilyMember {
   id: string;
-  pageId: "p1" | "p2" | "p3" | "p4" | "p5" | "p6" | "p7";
+  pageId: "p1" | "p2" | "p3" | "p4" | "p5" | "p6" | "p7" | "p8";
   commonName: string;
   firstName: string;
   middleName?: string;
@@ -306,7 +306,7 @@ export function getEras(members: FamilyMember[]): Era[] {
 
 // Get family branches (by page)
 export function getBranches(members: FamilyMember[]): { label: string; pageId: string; rootMember: FamilyMember }[] {
-  const pages = ["p1", "p2", "p3", "p4", "p5", "p6", "p7"];
+  const pages = ["p1", "p2", "p3", "p4", "p5", "p6", "p7", "p8"];
   const labels = [
     "Haddock and Henderson",
     "Henderson and Mosey",
@@ -315,6 +315,7 @@ export function getBranches(members: FamilyMember[]): { label: string; pageId: s
     "Priestman and Patton",
     "Priestman and Wilson",
     "Priestman and Moses",
+    "Haddock Main",
   ];
   return pages
     .map((pageId, i) => {
