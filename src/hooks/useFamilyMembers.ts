@@ -34,6 +34,7 @@ const familyLineToPageId: Record<string, FamilyMember['pageId']> = {
   'Priestman and Patton':   'p5',
   'Priestman and Wilson':   'p6',
   'Priestman and Moses':    'p7',
+  'Haddock Main':           'p8',
 };
 
 const femaleNames = new Set([
