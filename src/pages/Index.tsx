@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { Clock, MapPin, Users, Home } from "lucide-react";
+import { Clock, MapPin, Users, Home, Network } from "lucide-react";
 import TimelineView from "@/components/TimelineView";
 import MapView from "@/components/MapView";
 import { useFamilyMembers } from "@/hooks/useFamilyMembers";
@@ -55,6 +55,14 @@ const Index = () => {
 
           {/* View toggle */}
           <div className="flex rounded-lg border border-border bg-secondary p-1">
+            <button
+              disabled
+              className="flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium text-muted-foreground/40 cursor-default"
+            >
+              <Network className="h-4 w-4" />
+              Tree
+              <span className="ml-1 text-[10px] font-semibold uppercase tracking-wide border border-muted-foreground/20 rounded px-1">soon</span>
+            </button>
             <button
               onClick={() => handleSetView("timeline")}
               className={`flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-all ${

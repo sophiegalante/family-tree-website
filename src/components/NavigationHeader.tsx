@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { NavLink } from "@/components/NavLink";
-import { GitBranch, Home, Feather, Mail, Menu, X, Clock, MapPin, ChevronDown } from "lucide-react";
+import { GitBranch, Home, Feather, Mail, Menu, X, Clock, MapPin, ChevronDown, Network } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import FamilySearch from "@/components/FamilySearch";
 
@@ -58,13 +58,18 @@ const NavigationHeader = () => {
                 <ChevronDown className={`h-3.5 w-3.5 transition-transform ${exploreOpen ? "rotate-180" : ""}`} />
               </button>
               {exploreOpen && (
-                <div className="absolute left-0 top-full mt-1 w-40 rounded-lg border border-border bg-card shadow-lg">
+                <div className="absolute left-0 top-full mt-1 w-44 rounded-lg border border-border bg-card shadow-lg">
+                  <span className="flex items-center gap-2 px-3 py-2.5 text-sm text-muted-foreground/40 cursor-default rounded-t-lg">
+                    <Network className="h-4 w-4" />
+                    Tree
+                    <span className="ml-auto text-[10px] font-semibold uppercase tracking-wide border border-muted-foreground/20 rounded px-1">soon</span>
+                  </span>
                   {exploreItems.map((item) => (
                     <Link
                       key={item.to}
                       to={item.to}
                       onClick={() => setExploreOpen(false)}
-                      className="flex items-center gap-2 px-3 py-2.5 text-sm text-muted-foreground transition-colors hover:text-foreground hover:bg-accent first:rounded-t-lg last:rounded-b-lg"
+                      className="flex items-center gap-2 px-3 py-2.5 text-sm text-muted-foreground transition-colors hover:text-foreground hover:bg-accent last:rounded-b-lg"
                     >
                       <item.icon className="h-4 w-4" />
                       {item.label}
@@ -116,6 +121,11 @@ const NavigationHeader = () => {
             Home
           </NavLink>
           <p className="px-3 pt-2 pb-1 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Explore</p>
+          <span className="flex items-center gap-2 rounded-md px-3 py-2.5 text-sm font-medium text-muted-foreground/40 cursor-default">
+            <Network className="h-4 w-4" />
+            Tree
+            <span className="ml-auto text-[10px] font-semibold uppercase tracking-wide border border-muted-foreground/20 rounded px-1">soon</span>
+          </span>
           {exploreItems.map((item) => (
             <Link
               key={item.to}
