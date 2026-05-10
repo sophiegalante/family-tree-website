@@ -65,11 +65,40 @@ const Home = () => {
 
   const todayLabel = new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long" });
 
-  const totalMembers = members.length;
-  const uniqueSurnames = [...new Set(members.map((m) => m.lastName))];
-  const { earliest, latest } = getBirthYearRange(members);
-  const uniquePlaces = [...new Set(members.map((m) => m.birthPlace).filter(Boolean))];
-  const marriages = members.filter((m) => m.marriageDate).length;
+  const allNamedPeople = new Set([
+    ...members.map(m => `${m.firstName} ${m.lastName}`.trim()),
+    ...members.map(m => m.spouseName).filter(Boolean) as string[],
+    ...members.map(m => m.parent1Name).filter(Boolean) as string[],
+    ...members.map(m => m.parent2Name).filter(Boolean) as string[],
+    ...members.flatMap(m => m.childrenNames),
+  ].filter(Boolean));
+  const totalPeople = allNamedPeople.size;
+
+  function extractYear(str?: string | null): number | null {
+    if (!str) return null;
+    const match = str.match(/\d{4}/);
+    const y = match ? parseInt(match[0]) : null;
+    return y && y > 1500 && y < 2100 ? y : null;
+  }
+  const allEventYears = members.flatMap(m => [
+    extractYear(m.birthDate),
+    extractYear(m.deathDate),
+    extractYear(m.marriageDate),
+    extractYear(m.baptismDate),
+  ]).filter((y): y is number => y !== null);
+  const { earliest } = getBirthYearRange(members);
+  const latestAnyYear = allEventYears.length ? Math.max(...allEventYears) : 0;
+
+  const allPlaces = members.flatMap(m => [
+    m.birthPlace, m.deathPlace, m.marriagePlace, m.baptismPlace
+  ]).filter(Boolean) as string[];
+  const uniqueLocations = [...new Set(allPlaces)].length;
+
+  const lifeEvents =
+    members.filter(m => m.birthDate).length +
+    members.filter(m => m.deathDate).length +
+    members.filter(m => m.marriageDate).length +
+    members.filter(m => m.baptismDate).length;
 
   return (
     <div className="min-h-screen bg-background">
@@ -98,10 +127,10 @@ const Home = () => {
               <span className="hidden sm:block h-4 w-px bg-border" />
               <div className="grid grid-cols-2 gap-4 sm:flex sm:items-center sm:gap-10">
                 {[
-                  { value: isLoading ? "…" : totalMembers, label: "Members" },
-                  { value: isLoading ? "…" : `${earliest}–${latest}`, label: "Timespan" },
-                  { value: isLoading ? "…" : uniquePlaces.length, label: "Locations" },
-                  { value: isLoading ? "…" : marriages, label: "Marriages" },
+                  { value: isLoading ? "…" : totalPeople.toLocaleString(), label: "People" },
+                  { value: isLoading ? "…" : `${earliest}–${latestAnyYear}`, label: "Timespan" },
+                  { value: isLoading ? "…" : uniqueLocations, label: "Locations" },
+                  { value: isLoading ? "…" : lifeEvents.toLocaleString(), label: "Life Events" },
                 ].map(({ value, label }, i, arr) => (
                   <React.Fragment key={label}>
                     <div className="text-center">
