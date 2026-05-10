@@ -130,7 +130,7 @@ const Home = () => {
                   { value: isLoading ? "…" : totalPeople.toLocaleString(), label: "People" },
                   { value: isLoading ? "…" : `${earliest}–${latestAnyYear}`, label: "Timespan" },
                   { value: isLoading ? "…" : uniqueLocations, label: "Locations" },
-                  { value: isLoading ? "…" : lifeEvents.toLocaleString(), label: "Life Events" },
+                  { value: isLoading ? "…" : lifeEvents.toLocaleString(), label: "Events" },
                 ].map(({ value, label }, i, arr) => (
                   <React.Fragment key={label}>
                     <div className="text-center">
