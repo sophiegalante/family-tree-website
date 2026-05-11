@@ -4,7 +4,7 @@ import { Search, X, User, MapPin } from "lucide-react";
 import { type FamilyMember } from "@/data/familyData";
 import { useFamilyMembers } from "@/hooks/useFamilyMembers";
 
-const FamilySearch = () => {
+const FamilySearch = ({ fullWidth = false }: { fullWidth?: boolean }) => {
   const { members } = useFamilyMembers();
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
@@ -48,8 +48,8 @@ const FamilySearch = () => {
   };
 
   return (
-    <div ref={containerRef} className="relative">
-      <div className="flex items-center gap-2 rounded-md border border-border bg-secondary/50 px-3 py-1.5 transition-colors focus-within:border-primary/50 focus-within:bg-card">
+    <div ref={containerRef} className={`relative ${fullWidth ? "w-full" : ""}`}>
+      <div className={`flex items-center gap-2 rounded-md border border-border bg-secondary/50 px-3 py-1.5 transition-colors focus-within:border-primary/50 focus-within:bg-card ${fullWidth ? "w-full" : ""}`}>
         <Search className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
         <input
           ref={inputRef}
@@ -61,7 +61,7 @@ const FamilySearch = () => {
             setOpen(true);
           }}
           onFocus={() => query && setOpen(true)}
-          className="w-28 bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none sm:w-44"
+          className={`${fullWidth ? "w-full" : "w-28 sm:w-44"} bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none`}
         />
         {query && (
           <button onClick={() => { setQuery(""); setResults([]); }} className="text-muted-foreground hover:text-foreground">

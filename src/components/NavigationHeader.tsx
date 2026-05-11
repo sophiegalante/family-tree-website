@@ -104,7 +104,7 @@ const NavigationHeader = () => {
       {mobileOpen && (
         <nav className="border-t border-border bg-background px-4 pb-4 pt-2 md:hidden space-y-1">
           <div className="py-2">
-            <FamilySearch />
+            <FamilySearch fullWidth />
           </div>
           <NavLink
             to="/"

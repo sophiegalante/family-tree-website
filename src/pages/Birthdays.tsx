@@ -43,6 +43,50 @@ type BirthdayEntry = {
   month: number;
 };
 
+// Shared card content used by both the side card (desktop) and bottom sheet (mobile)
+const DetailContent = ({
+  entry,
+  onClose,
+}: {
+  entry: BirthdayEntry;
+  onClose: () => void;
+}) => (
+  <>
+    <div className="flex items-start justify-between gap-2">
+      <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary shrink-0">
+        <Cake className="h-4 w-4" />
+      </div>
+      <button
+        onClick={onClose}
+        className="text-muted-foreground hover:text-foreground transition-colors"
+        aria-label="Close"
+      >
+        <X className="h-4 w-4" />
+      </button>
+    </div>
+
+    <div>
+      <p className="font-semibold text-foreground leading-snug">{entry.name}</p>
+      <p className="mt-1 text-xs text-muted-foreground">{entry.birthDate}</p>
+    </div>
+
+    <div className="rounded-lg bg-accent/60 px-3 py-2 text-center">
+      <p className="text-xl font-bold text-foreground">
+        {nextBirthdayAge(entry.day, entry.month, entry.birthYear)}
+      </p>
+      <p className="text-[11px] text-muted-foreground uppercase tracking-wider">Age</p>
+    </div>
+
+    <Link
+      to={`/member/${entry.memberId}`}
+      className="flex items-center justify-between rounded-lg border border-border px-3 py-2 text-xs font-medium text-foreground hover:border-primary/40 hover:bg-accent/30 transition-colors"
+    >
+      View full profile
+      <ArrowRight className="h-3.5 w-3.5 text-muted-foreground" />
+    </Link>
+  </>
+);
+
 const Birthdays = () => {
   const { members, isLoading } = useFamilyMembers();
   const today = new Date();
@@ -97,6 +141,8 @@ const Birthdays = () => {
   const isToday = (day: number) =>
     day === today.getDate() && viewMonth === today.getMonth() && viewYear === today.getFullYear();
 
+  const dismiss = () => setSelected(null);
+
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-12">
@@ -117,7 +163,8 @@ const Birthdays = () => {
             <p className="text-sm text-muted-foreground">Loading…</p>
           ) : (
             <div className="flex gap-4 items-start">
-              {/* Calendar */}
+
+              {/* Calendar — always full width on mobile, flex-1 on desktop */}
               <div className="flex-1 rounded-xl border border-border bg-card overflow-hidden min-w-0">
                 {/* Month navigation */}
                 <div className="flex items-center justify-between px-5 py-4 border-b border-border">
@@ -195,46 +242,40 @@ const Birthdays = () => {
                 </div>
               </div>
 
-              {/* Detail card */}
+              {/* Desktop side card — hidden on mobile */}
               {selected && (
-                <div className="w-56 shrink-0 rounded-xl border border-border bg-card p-5 space-y-4">
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary shrink-0">
-                      <Cake className="h-4 w-4" />
-                    </div>
-                    <button
-                      onClick={() => setSelected(null)}
-                      className="text-muted-foreground hover:text-foreground transition-colors"
-                      aria-label="Close"
-                    >
-                      <X className="h-4 w-4" />
-                    </button>
-                  </div>
-
-                  <div>
-                    <p className="font-semibold text-foreground leading-snug">{selected.name}</p>
-                    <p className="mt-1 text-xs text-muted-foreground">{selected.birthDate}</p>
-                  </div>
-
-                  <div className="rounded-lg bg-accent/60 px-3 py-2 text-center">
-                    <p className="text-xl font-bold text-foreground">
-                      {nextBirthdayAge(selected.day, selected.month, selected.birthYear)}
-                    </p>
-                    <p className="text-[11px] text-muted-foreground uppercase tracking-wider">Age</p>
-                  </div>
-
-                  <Link
-                    to={`/member/${selected.memberId}`}
-                    className="flex items-center justify-between rounded-lg border border-border px-3 py-2 text-xs font-medium text-foreground hover:border-primary/40 hover:bg-accent/30 transition-colors"
-                  >
-                    View full profile
-                    <ArrowRight className="h-3.5 w-3.5 text-muted-foreground" />
-                  </Link>
+                <div className="hidden md:block w-56 shrink-0 rounded-xl border border-border bg-card p-5 space-y-4">
+                  <DetailContent entry={selected} onClose={dismiss} />
                 </div>
               )}
             </div>
           )}
         </div>
+      </div>
+
+      {/* Mobile bottom sheet — hidden on desktop */}
+      {/* Backdrop */}
+      <div
+        className={`fixed inset-0 z-40 bg-black/40 md:hidden transition-opacity duration-300
+          ${selected ? "opacity-100" : "opacity-0 pointer-events-none"}`}
+        onClick={dismiss}
+        aria-hidden="true"
+      />
+      {/* Sheet */}
+      <div
+        className={`fixed inset-x-0 bottom-0 z-50 md:hidden bg-card rounded-t-2xl border-t border-border
+          transition-transform duration-300 ease-out
+          ${selected ? "translate-y-0" : "translate-y-full"}`}
+      >
+        {/* Drag handle */}
+        <div className="flex justify-center pt-3 pb-1">
+          <div className="h-1 w-10 rounded-full bg-border" />
+        </div>
+        {selected && (
+          <div className="px-5 pt-2 pb-8 space-y-4">
+            <DetailContent entry={selected} onClose={dismiss} />
+          </div>
+        )}
       </div>
     </div>
   );
