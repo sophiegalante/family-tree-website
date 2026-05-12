@@ -13,15 +13,23 @@ interface FamilyMemberRow {
   last_name: string;
   birth_date: string;
   birth_place: string | null;
+  birth_lat: number | null;
+  birth_lng: number | null;
   baptism_date: string | null;
   baptism_place: string | null;
+  baptism_lat: number | null;
+  baptism_lng: number | null;
   parent_1: string | null;
   parent_2: string | null;
   death_date: string | null;
   death_place: string | null;
+  death_lat: number | null;
+  death_lng: number | null;
   spouse_name: string | null;
   marriage_date: string | null;
   marriage_location: string | null;
+  marriage_lat: number | null;
+  marriage_lng: number | null;
   children: string | null;
 }
 
@@ -121,15 +129,23 @@ function rowToMember(row: FamilyMemberRow): FamilyMember {
     birthDate: row.birth_date,
     birthYear,
     birthPlace: row.birth_place ?? undefined,
+    birthLat: row.birth_lat ?? undefined,
+    birthLng: row.birth_lng ?? undefined,
     baptismDate: row.baptism_date ?? undefined,
     baptismPlace: row.baptism_place ?? undefined,
+    baptismLat: row.baptism_lat ?? undefined,
+    baptismLng: row.baptism_lng ?? undefined,
     deathDate: row.death_date ?? undefined,
     deathYear,
     deathPlace: row.death_place ?? undefined,
+    deathLat: row.death_lat ?? undefined,
+    deathLng: row.death_lng ?? undefined,
     gender: inferGender(row.first_name),
     spouseName: row.spouse_name ?? undefined,
     marriageDate: row.marriage_date ?? undefined,
     marriagePlace: row.marriage_location ?? undefined,
+    marriageLat: row.marriage_lat ?? undefined,
+    marriageLng: row.marriage_lng ?? undefined,
     childrenNames,
     parent1Name: row.parent_1 ?? undefined,
     parent2Name: row.parent_2 ?? undefined,

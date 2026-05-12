@@ -3,128 +3,6 @@ import { type FamilyMember } from "@/data/familyData";
 import { useFamilyMembers } from "@/hooks/useFamilyMembers";
 import MemberDetail from "./MemberDetail";
 
-// Approximate geocoding for known places
-const placeCoords: Record<string, [number, number]> = {
-  "caldwell": [54.503, -1.725],
-  "stanwick st john": [54.492, -1.694],
-  "forcett": [54.518, -1.732],
-  "east layton": [54.489, -1.719],
-  "richmond": [54.403, -1.737],
-  "richmond, yorkshire": [54.403, -1.737],
-  "richmond, surrey": [51.461, -0.301],
-  "marske by richmond": [54.407, -1.777],
-  "marske by richmond, yorkshire": [54.407, -1.777],
-  "dalton, yorkshire": [54.474, -1.703],
-  "gayles": [54.470, -1.827],
-  "gayles fields": [54.470, -1.827],
-  "kirby ravensworth": [54.448, -1.825],
-  "kirby ravensworth, yorkshire": [54.448, -1.825],
-  "melsonby": [54.460, -1.680],
-  "melsonby, yorkshire": [54.460, -1.680],
-  "wycliffe, yorkshire": [54.530, -1.850],
-  "west layton": [54.490, -1.716],
-  "keighley": [53.868, -1.912],
-  "keighley, yorkshire": [53.868, -1.912],
-  "worth valley": [53.850, -1.950],
-  "worth valley, yorkshire": [53.850, -1.950],
-  "staincliffe, yorkshire": [53.680, -1.850],
-  "bradford, yorkshire": [53.795, -1.759],
-  "leyburn, yorkshire": [54.310, -1.831],
-  "aldbrough, yorkshire": [53.836, -0.249],
-  "darlington": [54.524, -1.553],
-  "south church": [54.661, -1.670],
-  "bishop auckland": [54.661, -1.670],
-  "auckland, co durham": [54.661, -1.670],
-  "new shildon": [54.624, -1.644],
-  "shildon, co durham": [54.624, -1.644],
-  "chester le street": [54.858, -1.572],
-  "chester le street, co durham": [54.858, -1.572],
-  "lamesley, chester le street, co durham": [54.912, -1.593],
-  "houghton": [54.841, -1.470],
-  "houghton le spring": [54.841, -1.470],
-  "heseldon, co durham": [54.758, -1.307],
-  "west rainton": [54.815, -1.493],
-  "west rainton, co durham": [54.815, -1.493],
-  "low moorsley": [54.830, -1.450],
-  "low moorsley, co durham": [54.830, -1.450],
-  "moorsley, co durham": [54.830, -1.450],
-  "east rainton": [54.815, -1.470],
-  "lanchester": [54.803, -1.758],
-  "lanchester, co durham": [54.803, -1.758],
-  "easington": [54.786, -1.353],
-  "easington, co durham": [54.786, -1.353],
-  "quarrington hill, co durham": [54.730, -1.500],
-  "durham": [54.776, -1.575],
-  "pittington": [54.785, -1.493],
-  "pittington, co durham": [54.785, -1.493],
-  "boldon colliery": [54.942, -1.460],
-  "gateshead": [54.959, -1.603],
-  "gateshead, co durham": [54.959, -1.603],
-  "hebburn": [54.972, -1.513],
-  "south shields": [54.997, -1.430],
-  "jarrow, co durham": [54.980, -1.490],
-  "waldridge, co durham": [54.844, -1.590],
-  "pelton, co durham": [54.859, -1.600],
-  "shadforth": [54.753, -1.480],
-  "belmont, co durham": [54.797, -1.540],
-  "monk hesleden, co durham": [54.750, -1.310],
-  "framwellgate moor, co durham": [54.800, -1.580],
-  "castle eden, co durham": [54.735, -1.350],
-  "kibblesworth, county durham": [54.905, -1.630],
-  "sunderland": [54.907, -1.381],
-  "sunderland, co durham": [54.907, -1.381],
-  "wingate, co durham": [54.722, -1.381],
-  "rotherham": [53.432, -1.357],
-  "newcastle": [54.978, -1.614],
-  "newcastle, northumberland": [54.978, -1.614],
-  "northallerton": [54.339, -1.430],
-  "northumberland, england": [55.200, -2.000],
-  "london": [51.507, -0.128],
-  "lambeth, london": [51.490, -0.117],
-  "oldham": [53.541, -2.118],
-  "oldham, lancashire": [53.541, -2.118],
-  "chorley, lancashire": [53.653, -2.632],
-  "droxford, hampshire": [50.955, -1.148],
-  "rother valley": [53.370, -1.300],
-  "ohio": [40.417, -82.907],
-  "irondale, jefferson county, ohio": [40.382, -80.680],
-  "canton, stark, ohio": [40.799, -81.379],
-  "saline, jefferson county": [40.350, -80.700],
-  "jefferson, adams, ohio": [38.754, -83.559],
-  "columbiana, ohio": [40.888, -80.690],
-  "stark, ohio": [40.814, -81.366],
-  "lima, ohio": [40.743, -84.105],
-  "fort shawnee, allen, ohio": [40.800, -84.140],
-  "seattle, king, washington, usa": [47.606, -122.332],
-  "warm beach, washington, usa": [48.167, -122.367],
-  "hammondsville": [40.547, -80.714],
-  "west virginia": [38.597, -80.455],
-  "weirton, hancock, west virginia": [40.419, -80.589],
-  "hancock, west virginia": [40.480, -80.570],
-  "new cumberland, hancock, west virginia": [40.497, -80.609],
-  "brooke, west virginia": [40.270, -80.578],
-  "titusville, pennsylvania": [41.627, -79.673],
-  "indiana": [40.267, -86.135],
-  "indiana, usa": [40.267, -86.135],
-  "madison, indiana": [38.736, -85.380],
-  "indianapolis": [39.768, -86.158],
-  "leesburg, florida": [28.811, -81.877],
-  "danville, vermilion county": [40.125, -87.630],
-  "vermilion county": [40.180, -87.730],
-  "westville, vermilion county": [40.042, -87.639],
-  "westville, vermilion county, illinois": [40.042, -87.639],
-  "caldwell, idaho": [43.663, -116.688],
-  "wisconsin": [43.784, -88.787],
-  "monroe, indiana": [40.750, -85.370],
-  "ravensworth, co durham": [54.865, -1.578],
-  "new durham": [54.780, -1.580],
-  "hutton magna, yorkshire": [54.520, -1.770],
-};
-
-function normalizePlace(place: string): string {
-  return place.toLowerCase().trim().replace(/\s+/g, " ");
-}
-
 interface LocationGroup {
   lat: number;
   lng: number;
@@ -152,38 +30,33 @@ export default function MapView() {
   const [mapLoaded, setMapLoaded] = useState(false);
   const [activeFilters, setActiveFilters] = useState<Set<EventType>>(new Set(eventTypes));
 
-  const { locationGroups, unmappedCount } = useMemo(() => {
+  const locationGroups = useMemo(() => {
     const groups: Record<string, LocationGroup> = {};
-    const unmapped = new Set<string>();
 
-    function addEvent(place: string | undefined, type: string, member: FamilyMember, detail: string) {
-      if (!place) return;
-      const norm = normalizePlace(place);
-      const coords = placeCoords[norm];
-      if (!coords) {
-        unmapped.add(norm);
-        return;
-      }
-
-      const key = `${coords[0]},${coords[1]}`;
+    function addEvent(
+      lat: number | undefined,
+      lng: number | undefined,
+      place: string | undefined,
+      type: string,
+      member: FamilyMember,
+      detail: string,
+    ) {
+      if (lat == null || lng == null) return;
+      const key = `${lat.toFixed(5)},${lng.toFixed(5)}`;
       if (!groups[key]) {
-        groups[key] = { lat: coords[0], lng: coords[1], placeName: place, events: [] };
+        groups[key] = { lat, lng, placeName: place ?? '', events: [] };
       }
       groups[key].events.push({ type, member, detail });
     }
 
     members.forEach((m) => {
-      addEvent(m.birthPlace, "birth", m, `Born ${m.birthDate}`);
-      addEvent(m.deathPlace, "death", m, `Died ${m.deathDate || ""}`);
-      addEvent(m.marriagePlace, "marriage", m, `Married ${m.spouseName || ""}, ${m.marriageDate || ""}`);
-      addEvent(m.baptismPlace, "baptism", m, `Baptised ${m.baptismDate || ""}`);
+      addEvent(m.birthLat, m.birthLng, m.birthPlace, "birth", m, `Born ${m.birthDate}`);
+      addEvent(m.deathLat, m.deathLng, m.deathPlace, "death", m, `Died ${m.deathDate || ""}`);
+      addEvent(m.marriageLat, m.marriageLng, m.marriagePlace, "marriage", m, `Married ${m.spouseName || ""}, ${m.marriageDate || ""}`);
+      addEvent(m.baptismLat, m.baptismLng, m.baptismPlace, "baptism", m, `Baptised ${m.baptismDate || ""}`);
     });
 
-    if (import.meta.env.DEV && unmapped.size > 0) {
-      console.debug('[MapView] unmapped places (add to placeCoords):', [...unmapped].sort());
-    }
-
-    return { locationGroups: Object.values(groups), unmappedCount: unmapped.size };
+    return Object.values(groups);
   }, [members]);
 
   const toggleFilter = (type: EventType) => {
@@ -305,11 +178,6 @@ export default function MapView() {
           </button>
         ))}
         <span className="text-xs text-muted-foreground">({filteredCount} locations)</span>
-        {unmappedCount > 0 && (
-          <span className="text-xs text-amber-500 ml-auto">
-            ⚠ {unmappedCount} place{unmappedCount !== 1 ? "s" : ""} not on map
-          </span>
-        )}
       </div>
 
       {/* Map container — always rendered so mapRef is available for Leaflet init */}
