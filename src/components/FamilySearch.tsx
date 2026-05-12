@@ -18,16 +18,19 @@ const FamilySearch = ({ fullWidth = false }: { fullWidth?: boolean }) => {
       setResults([]);
       return;
     }
-    const q = query.toLowerCase();
+    const tokens = query.toLowerCase().trim().split(/\s+/).filter(Boolean);
     setResults(
-      members.filter(
-        (m) =>
-          m.commonName.toLowerCase().includes(q) ||
-          m.firstName.toLowerCase().includes(q) ||
-          m.lastName.toLowerCase().includes(q) ||
-          m.birthPlace?.toLowerCase().includes(q) ||
-          m.spouseName?.toLowerCase().includes(q)
-      ).slice(0, 8)
+      members.filter((m) => {
+        const fields = [
+          m.commonName,
+          m.firstName,
+          m.middleName ?? "",
+          m.lastName,
+          m.spouseName ?? "",
+          ...m.childrenNames,
+        ].map((f) => f.toLowerCase());
+        return tokens.every((token) => fields.some((f) => f.includes(token)));
+      }).slice(0, 8)
     );
   }, [query, members]);
 
