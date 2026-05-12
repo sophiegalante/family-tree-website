@@ -38,6 +38,7 @@ const familyLineToPageId: Record<string, FamilyMember['pageId']> = {
 };
 
 const femaleNames = new Set([
+  // Original set
   "elizabeth","mary","ann","anna","margaret","jane","rachel","hannah","martha",
   "tabitha","dorothy","hilda","eileen","marion","kathleen","sophie","lucia","helena",
   "brigitte","marie","elena","ingrid","theresa","rosina","johanna","clara","elise",
@@ -51,6 +52,40 @@ const femaleNames = new Set([
   "gertrude","doris","lucilla","freda","lilian","june","jessie","annie","edith",
   "gladys","jean","daphne","judith","alison","angela","helen","tonia",
   "victoria","irene","lydia","ida","catherine","elsie","evelyn",
+  // Victorian & Northern English
+  "abigail","ada","adah","addie","adela","adelaide","adeline","adella",
+  "alberta","albina","alma","almira","althea","alvina","amelia","amy",
+  "arabella","barbara","belle","bernadette","bernice","berta","bess","bessie",
+  "betsey","betsy","betty","blanche","bridget","caroline","celia","charlotte",
+  "christiana","christina","constance","cora","cordelia","daisy","deborah",
+  "della","diana","dinah","effie","eliza","ella","ellie","elma","elna",
+  "elvira","emeline","emily","ernestine","esther","eugenia","euphemia","eva",
+  "evelina","fanny","fern","flora","frances","genevieve","georgia","georgiana",
+  "geraldine","grace","harriet","harriett","hattie","henrietta","hettie",
+  "honor","honora","inez","janet","jeanette","jennie","jenny","joanna",
+  "josephine","julianna","kate","lena","leona","letta","lettie","lillie",
+  "lilly","lily","lizzie","lois","loretta","louisa","louise","lucie",
+  "lucinda","lucy","luella","lula","luna","mabel","madeline","maggie",
+  "malinda","mamie","marcella","matilda","maxine","may","mayme","mercy",
+  "millie","mina","minnie","miranda","mollie","molly","muriel","myra","myrtle",
+  "nancy","naomi","nell","nettie","nina","nola","octavia","olive","olivia",
+  "ora","polly","prudence","reba","rebecca","roberta","rosa","rosalie",
+  "rosanna","rose","rowena","ruby","ruth","sadie","sallie","sally","selma",
+  "serena","sibyl","sybil","sophia","sophronia","stella","sue","susanna",
+  "susannah","susy","temperance","tessie","tilda","tillie","ursula","velma",
+  "vesta","winona","zilpha","zina","zora",
+  // American (Ohio/West Virginia/Pennsylvania)
+  "almeda","arvilla","delilah","delphia","drusilla","eldora","elnora",
+  "emaline","emogene","euphenia","evaline","evalyn","faith","felicia",
+  "gertha","goldie","gussie","hanna","idella","iona","ira","irma",
+  "isabell","lavina","lavinia","leah","leila","leota","letta","levia",
+  "llewellyn","lola","lottie","louella","lovina","lula","lulie","lurena",
+  "madora","malvina","mandy","mariah","marietta","marilla","maude","melvina",
+  "mertie","minerva","mora","myrtie","nan","nana","narcissa","olevia",
+  "olexa","ollie","osmia","permelia","phebe","philena","phillis","phoebe",
+  "pinkie","prudence","purdy","rhoda","rosanna","roxana","roxanna","rubie",
+  "savannah","sena","sibbie","sophronia","tabitha","tena","thirza","thursa",
+  "vernie","vida","vinnie","violetta","virgie","virginia","wilda","zelda","zilah",
 ]);
 
 function extractYear(dateStr: string | null): number | undefined {
@@ -61,7 +96,11 @@ function extractYear(dateStr: string | null): number | undefined {
 
 function inferGender(firstName: string): 'male' | 'female' {
   const check = firstName.split(' ')[0].replace(/"/g, '').toLowerCase();
-  return femaleNames.has(check) ? 'female' : 'male';
+  const isFemale = femaleNames.has(check);
+  if (import.meta.env.DEV && !isFemale) {
+    console.debug('[gender] defaulting to male for unknown name:', check);
+  }
+  return isFemale ? 'female' : 'male';
 }
 
 function rowToMember(row: FamilyMemberRow): FamilyMember {

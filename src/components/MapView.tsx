@@ -146,19 +146,24 @@ export default function MapView() {
   const { members, isLoading } = useFamilyMembers();
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<any>(null);
+  const clusterGroupRef = useRef<any>(null);
   const markersRef = useRef<any[]>([]);
   const [selected, setSelected] = useState<FamilyMember | null>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
   const [activeFilters, setActiveFilters] = useState<Set<EventType>>(new Set(eventTypes));
 
-  const locationGroups = useMemo(() => {
+  const { locationGroups, unmappedCount } = useMemo(() => {
     const groups: Record<string, LocationGroup> = {};
+    const unmapped = new Set<string>();
 
     function addEvent(place: string | undefined, type: string, member: FamilyMember, detail: string) {
       if (!place) return;
       const norm = normalizePlace(place);
       const coords = placeCoords[norm];
-      if (!coords) return;
+      if (!coords) {
+        unmapped.add(norm);
+        return;
+      }
 
       const key = `${coords[0]},${coords[1]}`;
       if (!groups[key]) {
@@ -174,7 +179,11 @@ export default function MapView() {
       addEvent(m.baptismPlace, "baptism", m, `Baptised ${m.baptismDate || ""}`);
     });
 
-    return Object.values(groups);
+    if (import.meta.env.DEV && unmapped.size > 0) {
+      console.debug('[MapView] unmapped places (add to placeCoords):', [...unmapped].sort());
+    }
+
+    return { locationGroups: Object.values(groups), unmappedCount: unmapped.size };
   }, [members]);
 
   const toggleFilter = (type: EventType) => {
@@ -189,11 +198,10 @@ export default function MapView() {
   // Update markers when filters change
   useEffect(() => {
     const L = (window as any).L;
-    const map = mapInstanceRef.current;
-    if (!L || !map) return;
+    const clusterGroup = clusterGroupRef.current;
+    if (!L || !clusterGroup) return;
 
-    // Remove existing markers
-    markersRef.current.forEach((m) => map.removeLayer(m));
+    clusterGroup.clearLayers();
     markersRef.current = [];
 
     locationGroups.forEach((group) => {
@@ -203,12 +211,12 @@ export default function MapView() {
       const popupContent = `
         <div style="font-family: system-ui, sans-serif; max-width: 280px;">
           <h3 style="margin:0 0 8px; font-size:14px; font-weight:600;">${group.placeName}</h3>
-          <div style="max-height:180px; overflow-y:auto;">
+          <div style="max-height:220px; overflow-y:auto; padding-right:4px;">
             ${filteredEvents
               .map(
                 (ev) => `
-              <div style="font-size:12px; margin-bottom:4px; display:flex; gap:4px;">
-                <span>${typeLabels[ev.type] || ""}</span>
+              <div style="font-size:12px; margin-bottom:6px; display:flex; gap:4px; align-items:flex-start;">
+                <span style="flex-shrink:0;">${typeLabels[ev.type] || ""}</span>
                 <span><strong>${ev.member.firstName} ${ev.member.lastName}</strong> — ${ev.detail}</span>
               </div>`
               )
@@ -217,7 +225,8 @@ export default function MapView() {
         </div>
       `;
 
-      const marker = L.marker([group.lat, group.lng]).addTo(map).bindPopup(popupContent);
+      const marker = L.marker([group.lat, group.lng]).bindPopup(popupContent, { maxWidth: 300 });
+      clusterGroup.addLayer(marker);
       markersRef.current.push(marker);
     });
   }, [activeFilters, locationGroups, mapLoaded]);
@@ -225,32 +234,49 @@ export default function MapView() {
   useEffect(() => {
     if (mapInstanceRef.current || !mapRef.current) return;
 
-    const linkEl = document.createElement("link");
-    linkEl.rel = "stylesheet";
-    linkEl.href = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.css";
-    document.head.appendChild(linkEl);
+    function loadCss(href: string) {
+      const el = document.createElement("link");
+      el.rel = "stylesheet";
+      el.href = href;
+      document.head.appendChild(el);
+    }
 
-    const scriptEl = document.createElement("script");
-    scriptEl.src = "https://unpkg.com/leaflet@1.9.4/dist/leaflet.js";
-    scriptEl.onload = () => {
-      const L = (window as any).L;
-      if (!L || !mapRef.current) return;
+    function loadScript(src: string, onload: () => void) {
+      const el = document.createElement("script");
+      el.src = src;
+      el.onload = onload;
+      document.head.appendChild(el);
+    }
 
-      const map = L.map(mapRef.current).setView([53.5, -1.5], 7);
-      mapInstanceRef.current = map;
+    loadCss("https://unpkg.com/leaflet@1.9.4/dist/leaflet.css");
+    loadCss("https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css");
+    loadCss("https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css");
 
-      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-      }).addTo(map);
+    loadScript("https://unpkg.com/leaflet@1.9.4/dist/leaflet.js", () => {
+      loadScript("https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js", () => {
+        const L = (window as any).L;
+        if (!L || !mapRef.current) return;
 
-      setMapLoaded(true);
-    };
-    document.head.appendChild(scriptEl);
+        const map = L.map(mapRef.current).setView([53.5, -1.5], 7);
+        mapInstanceRef.current = map;
+
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+        }).addTo(map);
+
+        const clusterGroup = L.markerClusterGroup({ chunkedLoading: true });
+        clusterGroupRef.current = clusterGroup;
+        map.addLayer(clusterGroup);
+
+        setMapLoaded(true);
+      });
+    });
 
     return () => {
       if (mapInstanceRef.current) {
         mapInstanceRef.current.remove();
         mapInstanceRef.current = null;
+        clusterGroupRef.current = null;
       }
     };
   }, []);
@@ -258,10 +284,6 @@ export default function MapView() {
   const filteredCount = locationGroups.filter((g) =>
     g.events.some((ev) => activeFilters.has(ev.type as EventType))
   ).length;
-
-  if (isLoading) {
-    return <div className="p-4 text-muted-foreground">Loading map data…</div>;
-  }
 
   return (
     <div className="space-y-4">
@@ -271,6 +293,7 @@ export default function MapView() {
           <button
             key={type}
             onClick={() => toggleFilter(type)}
+            disabled={isLoading}
             className={`flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm font-medium transition-all ${
               activeFilters.has(type)
                 ? "border-primary bg-primary/10 text-foreground"
@@ -282,13 +305,18 @@ export default function MapView() {
           </button>
         ))}
         <span className="text-xs text-muted-foreground">({filteredCount} locations)</span>
+        {unmappedCount > 0 && (
+          <span className="text-xs text-amber-500 ml-auto">
+            ⚠ {unmappedCount} place{unmappedCount !== 1 ? "s" : ""} not on map
+          </span>
+        )}
       </div>
 
-      {/* Map container */}
-      <div className="overflow-hidden rounded-xl border border-border shadow-lg" style={{ height: "600px" }}>
-        {!mapLoaded && (
-          <div className="flex h-full items-center justify-center bg-secondary text-muted-foreground">
-            Loading map...
+      {/* Map container — always rendered so mapRef is available for Leaflet init */}
+      <div className="relative overflow-hidden rounded-xl border border-border shadow-lg" style={{ height: "600px" }}>
+        {(isLoading || !mapLoaded) && (
+          <div className="absolute inset-0 z-10 flex h-full items-center justify-center bg-secondary text-muted-foreground">
+            {isLoading ? "Loading map data…" : "Loading map…"}
           </div>
         )}
         <div ref={mapRef} style={{ height: "100%", width: "100%" }} />
