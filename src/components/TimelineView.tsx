@@ -117,11 +117,12 @@ function EraSection({
           }
 
           const isLeft = idx % 2 === 0;
+          const pageIds = item.member.pageIds ?? [item.member.pageId];
           const branchColors = !selectedLine
-            ? item.member.pageIds.map((pid) => BRANCH_COLORS[pid]).filter(Boolean) as string[]
+            ? pageIds.map((pid) => BRANCH_COLORS[pid]).filter(Boolean) as string[]
             : undefined;
           const branchLabels = !selectedLine
-            ? item.member.pageIds.map((pid) => branchLabelMap[pid]).filter(Boolean) as string[]
+            ? pageIds.map((pid) => branchLabelMap[pid]).filter(Boolean) as string[]
             : undefined;
 
           return (
@@ -178,7 +179,7 @@ export default function TimelineView() {
     .map((era) => ({
       ...era,
       members: selectedLine
-        ? era.members.filter((m) => m.pageIds.includes(selectedLine))
+        ? era.members.filter((m) => (m.pageIds ?? [m.pageId]).includes(selectedLine))
         : era.members,
     }))
     .filter((era) => era.members.length > 0);

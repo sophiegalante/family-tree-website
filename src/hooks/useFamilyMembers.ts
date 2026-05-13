@@ -194,7 +194,7 @@ async function fetchFamilyMembers(): Promise<FamilyMember[]> {
 
 export function useFamilyMembers() {
   const query = useQuery({
-    queryKey: ['family-members'],
+    queryKey: ['family-members', 'v2'],
     queryFn: fetchFamilyMembers,
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
