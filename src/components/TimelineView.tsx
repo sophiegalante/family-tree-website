@@ -39,7 +39,7 @@ function TimelineEvent({
   return (
     <div className="relative flex items-start md:justify-center">
       <div className="absolute left-5 top-3 z-10 h-3 w-3 -translate-x-1/2 rotate-45 border-2 border-primary/50 bg-background md:left-1/2" />
-      <div className="ml-10 w-full md:ml-0 md:max-w-lg">
+      <div className="ml-10 w-full md:ml-0 md:max-w-lg md:mt-6">
         <div
           className="overflow-hidden rounded-lg border border-border bg-card shadow-sm"
           style={{ borderLeft: `4px solid ${style.borderColor}` }}
