@@ -78,7 +78,7 @@ function EraSection({
           {era.label}
           <span className="ml-2 text-sm font-normal text-muted-foreground">
             ({era.members.length} {era.members.length === 1 ? "person" : "people"}
-            {!selectedLine && eraEvents.length > 0 ? `, ${eraEvents.length} events` : ""})
+            {eraEvents.length > 0 ? `, ${eraEvents.length} events` : ""})
           </span>
         </span>
       </div>
@@ -226,9 +226,7 @@ export default function TimelineView() {
 
               const items: TimelineItem[] = [
                 ...era.members.map((m) => ({ type: "member" as const, member: m, year: m.birthYear })),
-                ...(!selectedLine
-                  ? eraEvents.map((e) => ({ type: "event" as const, event: e, year: e.year }))
-                  : []),
+                ...eraEvents.map((e) => ({ type: "event" as const, event: e, year: e.year })),
               ].sort((a, b) => a.year - b.year);
 
               return (
