@@ -158,14 +158,14 @@ function rowToMember(row: FamilyMemberRow): FamilyMember {
 function deduplicateMembers(members: FamilyMember[]): FamilyMember[] {
   const seen = new Map<string, FamilyMember>();
   for (const member of members) {
-    const personId = member.id.replace(/^p\d+-/, '');
-    const existing = seen.get(personId);
+    const key = member.commonName.trim().toLowerCase();
+    const existing = seen.get(key);
     if (existing) {
       if (!existing.pageIds.includes(member.pageId)) {
         existing.pageIds.push(member.pageId);
       }
     } else {
-      seen.set(personId, { ...member, pageIds: [member.pageId] });
+      seen.set(key, { ...member, pageIds: [member.pageId] });
     }
   }
   return Array.from(seen.values());
