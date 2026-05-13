@@ -75,12 +75,12 @@ export function getEventsForPerson(
 }
 
 // Category styling
-export const categoryStyles: Record<HistoricalEvent["category"], { emoji: string; label: string }> = {
-  war: { emoji: "⚔️", label: "Conflict" },
-  political: { emoji: "🏛️", label: "Political" },
-  social: { emoji: "👥", label: "Social" },
-  disaster: { emoji: "⚠️", label: "Disaster" },
-  industrial: { emoji: "🏭", label: "Industrial" },
-  cultural: { emoji: "🎭", label: "Cultural" },
-  migration: { emoji: "🚢", label: "Migration" },
+export const categoryStyles: Record<HistoricalEvent["category"], { emoji: string; label: string; borderColor: string }> = {
+  war:        { emoji: "⚔️",  label: "Conflict",   borderColor: "#dc2626" },
+  political:  { emoji: "🏛️", label: "Political",  borderColor: "#2563eb" },
+  social:     { emoji: "👥",  label: "Social",     borderColor: "#9333ea" },
+  disaster:   { emoji: "⚠️", label: "Disaster",   borderColor: "#ea580c" },
+  industrial: { emoji: "🏭", label: "Industrial", borderColor: "#0d9488" },
+  cultural:   { emoji: "🎭", label: "Cultural",   borderColor: "#d97706" },
+  migration:  { emoji: "🚢", label: "Migration",  borderColor: "#16a34a" },
 };

@@ -6,9 +6,11 @@ interface PersonCardProps {
   isSelected?: boolean;
   onClick?: () => void;
   compact?: boolean;
+  branchColor?: string;
+  branchLabel?: string;
 }
 
-export default function PersonCard({ member, isSelected, onClick, compact }: PersonCardProps) {
+export default function PersonCard({ member, isSelected, onClick, compact, branchColor, branchLabel }: PersonCardProps) {
   const lifespan = member.deathYear
     ? `${member.birthYear} – ${member.deathYear}`
     : `b. ${member.birthYear}`;
@@ -54,7 +56,13 @@ export default function PersonCard({ member, isSelected, onClick, compact }: Per
           <User className="h-5 w-5" />
         </div>
         <div className="min-w-0 flex-1">
-          <h3 className="font-semibold text-card-foreground">
+          <h3 className="flex items-center gap-1.5 font-semibold text-card-foreground">
+            {branchColor && (
+              <span
+                className="inline-block h-2 w-2 shrink-0 rounded-full"
+                style={{ backgroundColor: branchColor }}
+              />
+            )}
             {member.firstName}{member.middleName ? ` ${member.middleName}` : ""} {member.lastName}
           </h3>
           <p className="text-sm text-muted-foreground">{lifespan}</p>
@@ -63,6 +71,17 @@ export default function PersonCard({ member, isSelected, onClick, compact }: Per
               <MapPin className="h-3 w-3" />
               {member.birthPlace}
             </p>
+          )}
+          {branchLabel && (
+            <span
+              className="mt-2 inline-block rounded px-1.5 py-0.5 text-[10px] font-semibold"
+              style={{
+                backgroundColor: branchColor ? `${branchColor}18` : undefined,
+                color: branchColor ?? undefined,
+              }}
+            >
+              {branchLabel}
+            </span>
           )}
         </div>
       </div>

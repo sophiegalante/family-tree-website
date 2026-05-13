@@ -1,10 +1,20 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { type FamilyMember } from "@/data/familyData";
 import { useFamilyMembers } from "@/hooks/useFamilyMembers";
 import { historicalEvents, categoryStyles, type HistoricalEvent } from "@/data/historicalEvents";
 import PersonCard from "./PersonCard";
 import MemberDetail from "./MemberDetail";
 
+const BRANCH_COLORS: Record<string, string> = {
+  p1: "#6366f1",
+  p2: "#ec4899",
+  p3: "#f59e0b",
+  p4: "#10b981",
+  p5: "#3b82f6",
+  p6: "#ef4444",
+  p7: "#8b5cf6",
+  p8: "#14b8a6",
+};
 
 function countAlive(members: FamilyMember[], event: HistoricalEvent): number {
   const eventStart = event.year;
@@ -27,25 +37,30 @@ function TimelineEvent({
   const alive = countAlive(allMembers, event);
 
   return (
-    <div className="relative flex items-start gap-4 md:flex-row">
-      <div className="absolute left-5 top-3 z-10 h-3 w-3 -translate-x-1/2 rotate-45 border-2 border-primary/60 bg-accent md:left-1/2" />
-      <div className="ml-10 w-full md:mx-auto md:ml-0 md:max-w-lg">
-        <div className="rounded-lg border border-dashed border-primary/30 bg-accent/50 px-4 py-3">
-          <div className="flex items-start gap-2">
-            <span className="text-base mt-0.5">{style.emoji}</span>
-            <div className="flex-1">
-              <p className="text-sm font-semibold text-accent-foreground">
+    <div className="relative flex items-start md:justify-center">
+      <div className="absolute left-5 top-3 z-10 h-3 w-3 -translate-x-1/2 rotate-45 border-2 border-primary/50 bg-background md:left-1/2" />
+      <div className="ml-10 w-full md:ml-0 md:max-w-lg">
+        <div
+          className="overflow-hidden rounded-lg border border-border bg-card shadow-sm"
+          style={{ borderLeft: `4px solid ${style.borderColor}` }}
+        >
+          <div className="flex items-start gap-2.5 px-4 py-3">
+            <span className="mt-0.5 shrink-0 text-lg">{style.emoji}</span>
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-semibold text-foreground">
                 {event.name}
                 <span className="ml-2 text-xs font-normal text-muted-foreground">
                   {event.year}
                   {event.endYear && event.endYear !== event.year ? `–${event.endYear}` : ""}
                 </span>
               </p>
-              <p className="text-xs text-muted-foreground mt-0.5">{event.description}</p>
+              <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+                {event.description}
+              </p>
               {alive > 0 && (
-                <p className="mt-1.5 text-xs font-medium text-primary/80">
-                  {alive} family {alive === 1 ? "member" : "members"} alive during this event
-                </p>
+                <span className="mt-2 inline-flex items-center gap-1.5 rounded bg-primary/10 px-2 py-0.5 text-[11px] font-semibold text-primary">
+                  👥 {alive} family {alive === 1 ? "member" : "members"} alive during this event
+                </span>
               )}
             </div>
           </div>
@@ -61,6 +76,7 @@ function EraSection({
   selectedLine,
   eraEvents,
   allMembers,
+  branchLabelMap,
   onSelect,
 }: {
   era: { label: string; range: [number, number]; members: FamilyMember[] };
@@ -68,19 +84,23 @@ function EraSection({
   selectedLine: string | null;
   eraEvents: HistoricalEvent[];
   allMembers: FamilyMember[];
+  branchLabelMap: Record<string, string>;
   onSelect: (m: FamilyMember) => void;
 }) {
   return (
     <div className="relative">
       {/* Era header */}
-      <div className="sticky top-20 z-10 mb-6 flex md:justify-center">
-        <span className="inline-flex items-center rounded-full bg-accent px-4 py-1.5 font-display text-lg font-medium text-accent-foreground shadow-sm">
-          {era.label}
-          <span className="ml-2 text-sm font-normal text-muted-foreground">
-            ({era.members.length} {era.members.length === 1 ? "person" : "people"}
-            {eraEvents.length > 0 ? `, ${eraEvents.length} events` : ""})
+      <div className="sticky top-20 z-10 mb-8">
+        <div className="flex items-center gap-4 bg-background py-2">
+          <span className="shrink-0 font-display text-2xl font-bold tabular-nums text-foreground">
+            {era.label}
           </span>
-        </span>
+          <div className="h-px flex-1 bg-border" />
+          <span className="shrink-0 whitespace-nowrap text-sm text-muted-foreground">
+            {era.members.length} {era.members.length === 1 ? "person" : "people"}
+            {!selectedLine && eraEvents.length > 0 ? ` · ${eraEvents.length} events` : ""}
+          </span>
+        </div>
       </div>
 
       {/* Items */}
@@ -97,6 +117,9 @@ function EraSection({
           }
 
           const isLeft = idx % 2 === 0;
+          const branchColor = !selectedLine ? BRANCH_COLORS[item.member.pageId] : undefined;
+          const branchLabel = !selectedLine ? branchLabelMap[item.member.pageId] : undefined;
+
           return (
             <div
               key={item.member.id}
@@ -110,7 +133,12 @@ function EraSection({
                   isLeft ? "md:mr-auto md:pr-8" : "md:ml-auto md:pl-8"
                 }`}
               >
-                <PersonCard member={item.member} onClick={() => onSelect(item.member)} />
+                <PersonCard
+                  member={item.member}
+                  onClick={() => onSelect(item.member)}
+                  branchColor={branchColor}
+                  branchLabel={branchLabel}
+                />
               </div>
             </div>
           );
@@ -120,34 +148,22 @@ function EraSection({
   );
 }
 
-function FilterPill({
-  label,
-  active,
-  onClick,
-}: {
-  label: string;
-  active: boolean;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      onClick={onClick}
-      className={`rounded-full px-3 py-1 text-sm font-medium transition-colors whitespace-nowrap ${
-        active
-          ? "bg-primary text-primary-foreground"
-          : "bg-secondary text-muted-foreground hover:text-foreground hover:bg-accent"
-      }`}
-    >
-      {label}
-    </button>
-  );
-}
-
 export default function TimelineView() {
   const { members, eras, branches, isLoading } = useFamilyMembers();
   const [selected, setSelected] = useState<FamilyMember | null>(null);
   const [selectedEra, setSelectedEra] = useState<string | null>(null);
   const [selectedLine, setSelectedLine] = useState<string | null>(null);
+
+  const branchLabelMap = useMemo(() => {
+    const map: Record<string, string> = {};
+    branches.forEach((b) => { map[b.pageId] = b.label; });
+    return map;
+  }, [branches]);
+
+  const maxEraCount = useMemo(
+    () => Math.max(...eras.map((e) => e.members.length), 1),
+    [eras],
+  );
 
   if (isLoading) {
     return <div className="p-4 text-muted-foreground">Loading timeline…</div>;
@@ -164,35 +180,103 @@ export default function TimelineView() {
     .filter((era) => era.members.length > 0);
 
   const activeFilters = (selectedEra ? 1 : 0) + (selectedLine ? 1 : 0);
+  const earliest = eras.length ? eras[0].range[0] : "–";
+  const latest = eras.length ? eras[eras.length - 1].range[1] : "–";
 
   return (
     <div>
-      {/* Filter bar */}
-      <div className="mb-8 space-y-3">
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground w-16 shrink-0">Era</span>
-          <FilterPill label="All" active={!selectedEra} onClick={() => setSelectedEra(null)} />
+      {/* ── Filter bar ── */}
+      <div className="mb-8 space-y-4">
+
+        {/* Summary stats */}
+        <div className="flex flex-wrap items-center gap-x-6 gap-y-2 border-b border-border pb-4">
+          {[
+            { value: members.length.toLocaleString(), label: "People" },
+            { value: `${earliest}–${latest}`, label: "Timespan" },
+            { value: branches.length, label: "Branches" },
+            { value: historicalEvents.length, label: "Events" },
+          ].map(({ value, label }) => (
+            <div key={label} className="text-center">
+              <p className="text-sm font-bold text-foreground">{value}</p>
+              <p className="text-[10px] uppercase tracking-wider text-muted-foreground">{label}</p>
+            </div>
+          ))}
+        </div>
+
+        {/* Era filter — pills with density bars */}
+        <div className="flex flex-wrap items-start gap-2">
+          <span className="w-16 shrink-0 pt-1.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+            Era
+          </span>
+          <button
+            onClick={() => setSelectedEra(null)}
+            className={`rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors ${
+              !selectedEra
+                ? "border-primary bg-primary text-primary-foreground"
+                : "border-border bg-secondary text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            All
+          </button>
           {eras.map((era) => (
-            <FilterPill
+            <button
               key={era.label}
-              label={era.label}
-              active={selectedEra === era.label}
               onClick={() => setSelectedEra(selectedEra === era.label ? null : era.label)}
-            />
+              className={`rounded-lg border px-3 pb-2 pt-1.5 text-left transition-colors ${
+                selectedEra === era.label
+                  ? "border-primary/40 bg-primary/5 text-foreground"
+                  : "border-border bg-secondary text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <div className="text-xs font-semibold">{era.label}</div>
+              <div className="mt-0.5 text-[10px] text-muted-foreground">
+                {era.members.length} people
+              </div>
+              <div className="mt-1.5 h-0.5 w-full overflow-hidden rounded-full bg-border">
+                <div
+                  className="h-full rounded-full bg-primary/60 transition-all"
+                  style={{ width: `${Math.round((era.members.length / maxEraCount) * 100)}%` }}
+                />
+              </div>
+            </button>
           ))}
         </div>
+
+        {/* Branch/line filter — pills with color dots */}
         <div className="flex flex-wrap items-center gap-2">
-          <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground w-16 shrink-0">Line</span>
-          <FilterPill label="All" active={!selectedLine} onClick={() => setSelectedLine(null)} />
+          <span className="w-16 shrink-0 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+            Line
+          </span>
+          <button
+            onClick={() => setSelectedLine(null)}
+            className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-sm font-medium transition-colors ${
+              !selectedLine
+                ? "border-primary bg-primary text-primary-foreground"
+                : "border-border bg-secondary text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            All lines
+          </button>
           {branches.map((branch) => (
-            <FilterPill
+            <button
               key={branch.pageId}
-              label={branch.label}
-              active={selectedLine === branch.pageId}
               onClick={() => setSelectedLine(selectedLine === branch.pageId ? null : branch.pageId)}
-            />
+              className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-sm font-medium transition-colors ${
+                selectedLine === branch.pageId
+                  ? "border-primary/40 bg-primary/5 text-foreground"
+                  : "border-border bg-secondary text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <span
+                className="h-2 w-2 shrink-0 rounded-full"
+                style={{ backgroundColor: BRANCH_COLORS[branch.pageId] ?? "#aaa" }}
+              />
+              {branch.label}
+            </button>
           ))}
         </div>
+
+        {/* Active filter summary */}
         {activeFilters > 0 && (
           <div className="flex items-center gap-2">
             <span className="text-xs text-muted-foreground">
@@ -209,11 +293,14 @@ export default function TimelineView() {
         )}
       </div>
 
+      {/* ── Timeline ── */}
       {visibleEras.length === 0 ? (
-        <p className="text-center text-muted-foreground py-16">No members match the selected filters.</p>
+        <p className="py-16 text-center text-muted-foreground">
+          No members match the selected filters.
+        </p>
       ) : (
         <div className="relative">
-          <div className="absolute left-5 top-0 bottom-0 w-0.5 bg-border md:left-1/2 md:-translate-x-px" />
+          <div className="absolute bottom-0 left-5 top-0 w-0.5 bg-border md:left-1/2 md:-translate-x-px" />
           <div className="space-y-12">
             {visibleEras.map((era) => {
               const eraEvents = historicalEvents.filter(
@@ -226,7 +313,9 @@ export default function TimelineView() {
 
               const items: TimelineItem[] = [
                 ...era.members.map((m) => ({ type: "member" as const, member: m, year: m.birthYear })),
-                ...eraEvents.map((e) => ({ type: "event" as const, event: e, year: e.year })),
+                ...(!selectedLine
+                  ? eraEvents.map((e) => ({ type: "event" as const, event: e, year: e.year }))
+                  : []),
               ].sort((a, b) => a.year - b.year);
 
               return (
@@ -237,6 +326,7 @@ export default function TimelineView() {
                   selectedLine={selectedLine}
                   eraEvents={eraEvents}
                   allMembers={members}
+                  branchLabelMap={branchLabelMap}
                   onSelect={setSelected}
                 />
               );
@@ -245,7 +335,9 @@ export default function TimelineView() {
         </div>
       )}
 
-      {selected && <MemberDetail member={selected} onClose={() => setSelected(null)} members={members} />}
+      {selected && (
+        <MemberDetail member={selected} onClose={() => setSelected(null)} members={members} />
+      )}
     </div>
   );
 }
