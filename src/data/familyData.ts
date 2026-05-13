@@ -1,6 +1,7 @@
 export interface FamilyMember {
   id: string;
   pageId: "p1" | "p2" | "p3" | "p4" | "p5" | "p6" | "p7" | "p8";
+  pageIds: string[];
   commonName: string;
   firstName: string;
   middleName?: string;
@@ -327,7 +328,7 @@ export function getBranches(members: FamilyMember[]): { label: string; pageId: s
   ];
   return pages
     .map((pageId, i) => {
-      const branchMembers = members.filter((m) => m.pageId === pageId);
+      const branchMembers = members.filter((m) => m.pageIds.includes(pageId));
       if (branchMembers.length === 0) return null;
       return { label: labels[i], pageId, rootMember: branchMembers[0] };
     })
@@ -336,7 +337,7 @@ export function getBranches(members: FamilyMember[]): { label: string; pageId: s
 
 // Get members by page
 export function getMembersByBranch(members: FamilyMember[], pageId: string): FamilyMember[] {
-  return members.filter((m) => m.pageId === pageId);
+  return members.filter((m) => m.pageIds.includes(pageId));
 }
 
 // Find a member by plain name (e.g. "Jacob Henderson") — matches firstName+lastName

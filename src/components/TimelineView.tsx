@@ -117,8 +117,12 @@ function EraSection({
           }
 
           const isLeft = idx % 2 === 0;
-          const branchColor = !selectedLine ? BRANCH_COLORS[item.member.pageId] : undefined;
-          const branchLabel = !selectedLine ? branchLabelMap[item.member.pageId] : undefined;
+          const branchColors = !selectedLine
+            ? item.member.pageIds.map((pid) => BRANCH_COLORS[pid]).filter(Boolean) as string[]
+            : undefined;
+          const branchLabels = !selectedLine
+            ? item.member.pageIds.map((pid) => branchLabelMap[pid]).filter(Boolean) as string[]
+            : undefined;
 
           return (
             <div
@@ -136,8 +140,8 @@ function EraSection({
                 <PersonCard
                   member={item.member}
                   onClick={() => onSelect(item.member)}
-                  branchColor={branchColor}
-                  branchLabel={branchLabel}
+                  branchColors={branchColors}
+                  branchLabels={branchLabels}
                 />
               </div>
             </div>
@@ -174,34 +178,17 @@ export default function TimelineView() {
     .map((era) => ({
       ...era,
       members: selectedLine
-        ? era.members.filter((m) => m.pageId === selectedLine)
+        ? era.members.filter((m) => m.pageIds.includes(selectedLine))
         : era.members,
     }))
     .filter((era) => era.members.length > 0);
 
   const activeFilters = (selectedEra ? 1 : 0) + (selectedLine ? 1 : 0);
-  const earliest = eras.length ? eras[0].range[0] : "–";
-  const latest = eras.length ? eras[eras.length - 1].range[1] : "–";
 
   return (
     <div>
       {/* ── Filter bar ── */}
       <div className="mb-8 space-y-4">
-
-        {/* Summary stats */}
-        <div className="flex flex-wrap items-center gap-x-6 gap-y-2 border-b border-border pb-4">
-          {[
-            { value: members.length.toLocaleString(), label: "People" },
-            { value: `${earliest}–${latest}`, label: "Timespan" },
-            { value: branches.length, label: "Branches" },
-            { value: historicalEvents.length, label: "Events" },
-          ].map(({ value, label }) => (
-            <div key={label} className="text-center">
-              <p className="text-sm font-bold text-foreground">{value}</p>
-              <p className="text-[10px] uppercase tracking-wider text-muted-foreground">{label}</p>
-            </div>
-          ))}
-        </div>
 
         {/* Era filter — pills with density bars */}
         <div className="flex flex-wrap items-start gap-2">

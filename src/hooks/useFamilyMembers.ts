@@ -122,6 +122,7 @@ function rowToMember(row: FamilyMemberRow): FamilyMember {
   return {
     id: `${pageId}-${row.person_id}`,
     pageId,
+    pageIds: [pageId],
     commonName: row.common_name,
     firstName: row.first_name,
     middleName: row.middle_name ?? undefined,
@@ -154,12 +155,28 @@ function rowToMember(row: FamilyMemberRow): FamilyMember {
   };
 }
 
+function deduplicateMembers(members: FamilyMember[]): FamilyMember[] {
+  const seen = new Map<string, FamilyMember>();
+  for (const member of members) {
+    const personId = member.id.replace(/^p\d+-/, '');
+    const existing = seen.get(personId);
+    if (existing) {
+      if (!existing.pageIds.includes(member.pageId)) {
+        existing.pageIds.push(member.pageId);
+      }
+    } else {
+      seen.set(personId, { ...member, pageIds: [member.pageId] });
+    }
+  }
+  return Array.from(seen.values());
+}
+
 export function mapRowsToMembers(rows: FamilyMemberRow[] | undefined): FamilyMember[] {
   if (!rows || rows.length === 0) {
     return [];
   }
 
-  return rows.map(rowToMember);
+  return deduplicateMembers(rows.map(rowToMember));
 }
 
 async function fetchFamilyMembers(): Promise<FamilyMember[]> {

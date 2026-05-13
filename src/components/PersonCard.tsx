@@ -6,11 +6,11 @@ interface PersonCardProps {
   isSelected?: boolean;
   onClick?: () => void;
   compact?: boolean;
-  branchColor?: string;
-  branchLabel?: string;
+  branchColors?: string[];
+  branchLabels?: string[];
 }
 
-export default function PersonCard({ member, isSelected, onClick, compact, branchColor, branchLabel }: PersonCardProps) {
+export default function PersonCard({ member, isSelected, onClick, compact, branchColors, branchLabels }: PersonCardProps) {
   const lifespan = member.deathYear
     ? `${member.birthYear} – ${member.deathYear}`
     : `b. ${member.birthYear}`;
@@ -57,11 +57,16 @@ export default function PersonCard({ member, isSelected, onClick, compact, branc
         </div>
         <div className="min-w-0 flex-1">
           <h3 className="flex items-center gap-1.5 font-semibold text-card-foreground">
-            {branchColor && (
-              <span
-                className="inline-block h-2 w-2 shrink-0 rounded-full"
-                style={{ backgroundColor: branchColor }}
-              />
+            {branchColors && branchColors.length > 0 && (
+              <span className="flex items-center gap-0.5">
+                {branchColors.map((color, i) => (
+                  <span
+                    key={i}
+                    className="inline-block h-2 w-2 shrink-0 rounded-full"
+                    style={{ backgroundColor: color }}
+                  />
+                ))}
+              </span>
             )}
             {member.firstName}{member.middleName ? ` ${member.middleName}` : ""} {member.lastName}
           </h3>
@@ -72,16 +77,21 @@ export default function PersonCard({ member, isSelected, onClick, compact, branc
               {member.birthPlace}
             </p>
           )}
-          {branchLabel && (
-            <span
-              className="mt-2 inline-block rounded px-1.5 py-0.5 text-[10px] font-semibold"
-              style={{
-                backgroundColor: branchColor ? `${branchColor}18` : undefined,
-                color: branchColor ?? undefined,
-              }}
-            >
-              {branchLabel}
-            </span>
+          {branchLabels && branchLabels.length > 0 && (
+            <div className="mt-2 flex flex-wrap gap-1">
+              {branchLabels.map((label, i) => (
+                <span
+                  key={label}
+                  className="inline-block rounded px-1.5 py-0.5 text-[10px] font-semibold"
+                  style={{
+                    backgroundColor: branchColors?.[i] ? `${branchColors[i]}18` : undefined,
+                    color: branchColors?.[i] ?? undefined,
+                  }}
+                >
+                  {label}
+                </span>
+              ))}
+            </div>
           )}
         </div>
       </div>
